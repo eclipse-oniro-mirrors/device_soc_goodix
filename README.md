@@ -11,15 +11,38 @@ Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN�
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+# OpenHarmony GR5515 SK快速上手
 
-#### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+## 搭建编译环境
+
+安装Ubuntu 18.04环境
+
+```bash
+# 安装必要的包
+sudo apt update
+sudo apt install -y binutils git git-lfs gnupg flex bison gperf build-essential \
+                    zip curl zlib1g-dev gcc-multilib g++-multilib libc6-dev-i386 \
+                    lib32ncurses5-dev x11proto-core-dev libx11-dev lib32z-dev ccache \
+                    libgl1-mesa-dev libxml2-utils xsltproc unzip m4 wget bc python python3 \
+                    android-tools-fsutils libssl-dev mtools
+
+# 安装repo
+curl https://gitee.com/oschina/repo/raw/fork_flow/repo-py3 | sudo tee /usr/local/bin/repo >/dev/null
+sudo chmod a+x /usr/local/bin/repo
+
+# 安装hb
+python3 -m pip uninstall ohos-build
+python3 -m pip install --user ohos-build
+
+# 将/bin/sh设置为/bin/bash
+sudo ln -sf bash /bin/sh
+
+# 设置git信息
+git config --global user.name your_name
+git config --global user.email your_email
+```
+
 
 #### 参与贡献
 
@@ -29,11 +52,4 @@ Gitee 是 OSCHINA 推出的基于 Git 的代码托管平台（同时支持 SVN�
 4.  新建 Pull Request
 
 
-#### 特技
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
