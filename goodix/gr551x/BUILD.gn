@@ -1,0 +1,87 @@
+
+import("//build/lite/config/subsystem/lite_subsystem.gni")
+import("//build/lite/config/component/lite_component.gni")
+
+copy("link-script") {
+    sources = [ "gr551x.ld"]
+    outputs = [ "$root_build_dir/bin/link.ld" ]
+}
+
+copy("sdk_lib") {
+     sources = [ "GR551x_SDK/components/sdk/linker/lib_gcc/libble_sdk.a"]
+     outputs = [ "$root_build_dir/libs/libble_sdk.a" ]
+ }
+
+copy("rom_symbol") {
+     sources = [ "GR551x_SDK/components/patch/symbol_table/rom_symbol_gcc.txt"]
+     outputs = [ "$root_build_dir/libs/rom_symbol_gcc.txt" ]
+ }
+
+source_set("device_soc"){
+    sources = [
+        "sdk_main.c",
+        "Core/Src/main.c",
+        "Core/Src/syscalls.c",
+        "Core/Src/sysmem.c",
+        "Core/Src/user_app.c",
+        "Core/Src/log_serial.c",
+        "Core/Src/user_periph_setup.c",
+
+        "Core/Startup/startup_gr55xx.s",
+
+        "GR551x_SDK/toolchain/gr551x/source/interrupt_gr55xx.c",
+        "GR551x_SDK/toolchain/gr551x/source/platform_gr55xx.c",
+        "GR551x_SDK/toolchain/gr551x/source/system_gr55xx.c",
+
+        "GR551x_SDK/drivers/src/gr55xx_hal.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_exflash.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_adc.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_gpio.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_pwr.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_aon_gpio.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_uart.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_calendar.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_aon_wdt.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_i2c.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_pwm.c",
+        "GR551x_SDK/drivers/src/gr55xx_hal_rng.c",
+
+        "GR551x_SDK/components/app_drivers/src/app_dma.c",
+        "GR551x_SDK/components/app_drivers/src/app_gpiote.c",
+        "GR551x_SDK/components/app_drivers/src/app_io.c",
+        "GR551x_SDK/components/app_drivers/src/app_pwr_mgmt.c",
+        "GR551x_SDK/components/app_drivers/src/app_systick.c",
+        "GR551x_SDK/components/app_drivers/src/app_uart.c",
+        "GR551x_SDK/components/app_drivers/src/app_rtc.c",
+        "GR551x_SDK/components/app_drivers/src/app_i2c.c",
+        "GR551x_SDK/components/app_drivers/src/app_pwm.c",
+        "GR551x_SDK/components/app_drivers/src/app_rng.c",
+        
+        "GR551x_SDK/components/libraries/ring_buffer/ring_buffer.c",
+        "GR551x_SDK/components/libraries/app_error/app_error.c",
+        "GR551x_SDK/components/libraries/app_assert/app_assert.c",
+        "GR551x_SDK/components/libraries/app_log/app_log.c",
+        "GR551x_SDK/components/libraries/utility/utility.c",
+        "GR551x_SDK/components/libraries/app_timer/app_timer.c",
+
+    ]
+
+    deps = [
+        ":link-script",
+        ":sdk_lib",
+        ":rom_symbol",
+        "//kernel/liteos_m:kernel",
+        "//base/startup/syspara_lite/frameworks/token:token",
+        "//base/startup/syspara_lite/frameworks/parameter:parameter",
+        "//test/xts/acts/build_lite:acts",
+        "//build/lite/config/component/cJSON:cjson_static",
+        "//utils/native/lite/kv_store/src:utils_kv_store",
+        "ohosdemo:ohosdemo",
+    ]
+}
+
+group("gr551x") {
+    deps = [
+        ":device_soc",
+    ]
+}
