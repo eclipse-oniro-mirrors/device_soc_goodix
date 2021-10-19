@@ -17,7 +17,7 @@
 步骤1，步骤2选择其中一步进行。
 
 1. 下载1.1.2_LTS指定标签的命令为：repo init -u https://gitee.com/openharmony/manifest.git -b refs/tags/OpenHarmony-v1.1.2-LTS --no-repo-verify。
-2. 打包下载所有文件，此时默认鸿蒙版本为1.0.1_release：repo init -u ssh://git@gitee.com/openharmony-sig/manifest.git -b OpenHarmony_1.0.1_release --no-repo-verify -m devboard_gr5515.xml。
+2. 打包下载所有文件，此时默认鸿蒙版本为1.0.1_release：repo init -u https://gitee.com/openharmony-sig/manifest.git -b OpenHarmony_1.0.1_release --no-repo-verify -m devboard_gr5515.xml。
 3. 下载好仓库后，输入：repo sync -c，也就是下载当前分支的代码。
 4. 下载好代码后，输入：repo forall -c 'git lfs pull'，下载部分大容量二进制文件。
 
