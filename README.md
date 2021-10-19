@@ -12,13 +12,16 @@
 
 ### 下载系统
 
-笔者使用的版本是1.1.2_LTS（基于1.0.1_release分支），仅在此版本进行了验证，读者最好下载此版本的鸿蒙系统源码。
+笔者使用的版本是1.1.2_LTS（基于1.0.1_release分支），仅在此版本进行了验证，建议读者下载此版本的鸿蒙系统源码。
 
-步骤：
+步骤1，步骤2选择其中一步进行。
 
 1. 下载1.1.2_LTS指定标签的命令为：repo init -u https://gitee.com/openharmony/manifest.git -b refs/tags/OpenHarmony-v1.1.2-LTS --no-repo-verify。
-2. 下载好仓库后，输入：repo sync -c，也就是下载当前分支的代码。
-3. 下载好代码后，输入：repo forall -c 'git lfs pull'，下载部分大容量二进制文件。
+2. 打包下载所有文件，此时默认鸿蒙版本为1.0.1_release：repo init -u ssh://git@gitee.com/openharmony-sig/manifest.git -b OpenHarmony_1.0.1_release --no-repo-verify -m devboard_gr5515.xml。
+3. 下载好仓库后，输入：repo sync -c，也就是下载当前分支的代码。
+4. 下载好代码后，输入：repo forall -c 'git lfs pull'，下载部分大容量二进制文件。
+
+
 
 ### 下载GR5515源码
 
@@ -90,11 +93,5 @@ user:~/Harmony/vendor$ tree -L 3
 3. 到Goodix官网下载最新的固件烧录工具GProgrammer和对应的指导文档手册，安装后按照文档进行固件烧录
 
 ## 常见错误排查
-
-
-
-
-
-
 
 
