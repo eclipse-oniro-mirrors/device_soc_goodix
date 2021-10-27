@@ -57,7 +57,7 @@ GR5515 Starter Kit（以下简称GR5515 SK）套件是基于的GR551x芯片（�
 
 如果下载系统时选择了打包下载，可跳过此步。
 
-1. 从https://gitee.com/openharmony-sig/devboard_device_goodix_gr551x.git          下载device仓内容。
+1. 从https://gitee.com/openharmony-sig/devboard_device_goodix_gr551x.git                下载device仓内容。
 2. 从https://gitee.com/openharmony-sig/devboard_vendor_goodix_gr5515_sk_basic.git 下载vendor仓内容。
 
 
@@ -98,7 +98,7 @@ user:~/Harmony/vendor$ tree -L 3
 
 ## 设置编译工具链
 
-1. 编译链工具推荐gcc-arm-none-eabi-10-2020-q4-major。(下载网站：https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads )。
+1. 编译链工具推荐使用gcc-arm-none-eabi-10-2020-q4-major。(下载网站：https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads )。
 2. 执行`vim ~/.bashrc`。
 3. 将工具链的路径加入环境变量, 如:`export PATH=/home/tools/ARM/gcc-arm-none-eabi-10-2020-q4-major/bin:$PATH`。
 3. 保存后执行`source ~/.bashrc`使环境变量生效。
@@ -113,7 +113,7 @@ user:~/Harmony/vendor$ tree -L 3
 
 ## 镜像烧录
 
-生成的镜像位于out/gr551x/gr551x_sk/bin，固件转换工具位于device/goodix/gr551x/GR551x_SDK/tools固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
+生成的镜像位于out/gr551x/gr551x_sk/bin，固件转换工具位于device/goodix/gr551x/GR551x_SDK/tools目录下，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
 
 1. 将device/goodix/gr551x/GR551x_SDK目录下tools文件夹拷贝到Windows下，然后将out/gr551x/gr551x_sk/bin目录下的application.bin拷贝到tools文件夹。
 2. 在tools目录下，点击after_build.bat脚本，对原始的application.bin进行转换处理，转换后固件输出到当前目录的ble_tool_bin文件夹下，application_fw.bin即是待烧录的最终固件。
