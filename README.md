@@ -129,5 +129,6 @@ user:~/Harmony/vendor$ tree -L 3
 
 ## 相关仓库
 
-device/goodix/devboard_device_goodix_gr551x
-vendor/goodix/devboard_vendor_goodix_gr5515_sk_basic
+[devboard_device_goodix_gr551x](https://gitee.com/openharmony-sig/devboard_device_goodix_gr551x)
+
+[devboard_vendor_goodix_gr5515_sk_basic](https://gitee.com/openharmony-sig/devboard_vendor_goodix_gr5515_sk_basic)
