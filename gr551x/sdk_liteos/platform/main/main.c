@@ -1,23 +1,18 @@
-/* USER CODE BEGIN Header */
-/**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * <h2><center>&copy; Copyright (c) 2021 STMicroelectronics.
-  * All rights reserved.</center></h2>
-  *
-  * This software component is licensed by ST under BSD 3-Clause license,
-  * the "License"; You may not use this file except in compliance with the
-  * License. You may obtain a copy of the License at:
-  *                        opensource.org/licenses/BSD-3-Clause
-  *
-  ******************************************************************************
-  */
-/* USER CODE END Header */
-/* Includes ------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2021 GOODIX.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 #include "main.h"
 #include "los_arch_interrupt.h"
 #include "stdint.h"
@@ -27,7 +22,7 @@
 #include "app_rng.h"
 #include "app_log.h"
 
-#define RNG_PARAM           {APP_RNG_TYPE_POLLING, {RNG_SEED_FR0_S0, RNG_LFSR_MODE_59BIT, RNG_OUTPUT_LFSR, RNG_POST_PRO_NOT}}
+#define RNG_PARAM   {APP_RNG_TYPE_POLLING, {RNG_SEED_FR0_S0, RNG_LFSR_MODE_59BIT, RNG_OUTPUT_LFSR, RNG_POST_PRO_NOT}}
 
 static const uint8_t  s_bd_addr[SYS_BD_ADDR_LEN] = {0x08, 0x08, 0x08, 0xea, 0xea, 0xea};
 static uint16_t g_random_seed[8] = {0x1234, 0x5678, 0x90AB, 0xCDEF, 0x1468, 0x2345, 0x5329, 0x2411};
@@ -125,5 +120,3 @@ int main(void)
     OHOS_Boot();
     while(1);
 }
-
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

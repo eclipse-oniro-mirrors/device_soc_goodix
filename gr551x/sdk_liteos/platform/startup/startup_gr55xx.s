@@ -3,37 +3,25 @@
  * @brief    CMSIS Cortex-M ARMv7-M based Core Device Startup File for
  *           Device GR55xx
  * @version  V1.00
- * @date     12. June 2018
+ * @date     10. September 2021
  *
  * @note
  *
  ******************************************************************************/
-/* Copyright (c) 2016-2018, Shenzhen Huiding Technology Co., Ltd
-
-   All rights reserved.
-   Redistribution and use in source and binary forms, with or without
-   modification, are permitted provided that the following conditions are met:
-   - Redistributions of source code must retain the above copyright
-     notice, this list of conditions and the following disclaimer.
-   - Redistributions in binary form must reproduce the above copyright
-     notice, this list of conditions and the following disclaimer in the
-     documentation and/or other materials provided with the distribution.
-   - Neither the name of ARM nor the names of its contributors may be used
-     to endorse or promote products derived from this software without
-     specific prior written permission.
-   *
-   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
-   AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-   ARE DISCLAIMED. IN NO EVENT SHALL COPYRIGHT HOLDERS AND CONTRIBUTORS BE
-   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
-   CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
-   SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
-   CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
-   ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-   POSSIBILITY OF SUCH DAMAGE.
-   ---------------------------------------------------------------------------*/
+/*
+ * Copyright (c) 2021 GOODIX.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
   .syntax unified
   .cpu cortex-m4
@@ -63,9 +51,6 @@
 Reset_Handler:  
   ldr   sp, =_estack     /* set stack pointer */
   bl  SystemInit
-  
-
-  //bl __libc_init_array
 
 /* Call the application's entry point.*/
   bl  main_init
@@ -91,7 +76,7 @@ Infinite_Loop:
 * 0x0000.0000.
 * 
 *******************************************************************************/
-   .section  .isr_vector,"a",%progbits
+  .section  .isr_vector,"a",%progbits
   .type  g_pfnVectors, %object
   .size  g_pfnVectors, .-g_pfnVectors
 
@@ -114,42 +99,41 @@ g_pfnVectors:
   .word  SysTick_Handler
   
   /* External Interrupts */
-  .word     WDT_IRQHandler                   
-  .word     BLE_SDK_Handler                  
-  .word     BLE_IRQHandler                 
-  .word     DMA_IRQHandler                 
-  .word     SPI_M_IRQHandler               
-  .word     SPI_S_IRQHandler               
-  .word     EXT0_IRQHandler                  
-  .word     EXT1_IRQHandler                  
-  .word     TIMER0_IRQHandler                
-  .word     TIMER1_IRQHandler 
-  .word     DUAL_TIMER_IRQHandler
-  .word     QSPI0_IRQHandler
-  .word     UART0_IRQHandler      
-  .word     UART1_IRQHandler
-  .word     I2C0_IRQHandler
-  .word     I2C1_IRQHandler
-  .word     AES_IRQHandler
-  .word     HMAC_IRQHandler
-  .word     EXT2_IRQHandler
-  .word     RNG_IRQHandler
-  .word     PMU_IRQHandler
-  .word     PKC_IRQHandler
-  .word     XQSPI_IRQHandler
-  .word     QSPI1_IRQHandler
-  .word     PWR_CMD_IRQHandler
-  .word     BLESLP_IRQHandler
-  .word     SLPTIMER_IRQHandler
-  .word     COMP_IRQHandler
-  .word     AON_WDT_IRQHandler
-  .word     I2S_M_IRQHandler
-  .word     I2S_S_IRQHandler
-  .word     ISO7816_IRQHandler
-  .word     PRESENT_IRQHandler
-  .word     CALENDAR_IRQHandler
+  .word  WDT_IRQHandler                   
+  .word  BLE_SDK_Handler                  
+  .word  BLE_IRQHandler                 
+  .word  DMA_IRQHandler                 
+  .word  SPI_M_IRQHandler               
+  .word  SPI_S_IRQHandler               
+  .word  EXT0_IRQHandler                  
+  .word  EXT1_IRQHandler                  
+  .word  TIMER0_IRQHandler                
+  .word  TIMER1_IRQHandler 
+  .word  DUAL_TIMER_IRQHandler
+  .word  QSPI0_IRQHandler
+  .word  UART0_IRQHandler      
+  .word  UART1_IRQHandler
+  .word  I2C0_IRQHandler
+  .word  I2C1_IRQHandler
+  .word  AES_IRQHandler
+  .word  HMAC_IRQHandler
+  .word  EXT2_IRQHandler
+  .word  RNG_IRQHandler
+  .word  PMU_IRQHandler
+  .word  PKC_IRQHandler
+  .word  XQSPI_IRQHandler
+  .word  QSPI1_IRQHandler
+  .word  PWR_CMD_IRQHandler
+  .word  BLESLP_IRQHandler
+  .word  SLPTIMER_IRQHandler
+  .word  COMP_IRQHandler
+  .word  AON_WDT_IRQHandler
+  .word  I2S_M_IRQHandler
+  .word  I2S_S_IRQHandler
+  .word  ISO7816_IRQHandler
+  .word  PRESENT_IRQHandler
+  .word  CALENDAR_IRQHandler
 
-                      
 /*******************************************************************************
 *
 * Provide weak aliases for each Exception handler to the Default_Handler. 
@@ -172,9 +156,6 @@ g_pfnVectors:
    .weak      UsageFault_Handler
    .thumb_set UsageFault_Handler,Default_Handler
 
-  // .weak      SVC_Handler
-  // .thumb_set SVC_Handler,Default_Handler
-
    .weak      DebugMon_Handler
    .thumb_set DebugMon_Handler,Default_Handler
 
@@ -186,7 +167,6 @@ g_pfnVectors:
 
    .weak      WDT_IRQHandler                   
    .thumb_set WDT_IRQHandler,Default_Handler      
-
 
    .weak      BLE_SDK_Handler      
    .thumb_set BLE_SDK_Handler,Default_Handler
