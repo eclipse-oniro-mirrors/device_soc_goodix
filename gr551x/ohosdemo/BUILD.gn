@@ -1,5 +1,0 @@
-group("ohosdemo") {
-    deps = [
-        "hello_demo:app_hello",
-    ]
-}

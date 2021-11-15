@@ -1,0 +1,39 @@
+#include "device_info.hcs"
+root {
+    platform {
+        gpio_config {
+            match_attr = "gpio_config";
+            pin = [0, 1];
+            realPin = [5, 27];
+            config = [5, 2];
+            pinNum = 2;
+        }
+        i2c_config {
+            i2c0 {
+                match_attr = "i2c0_config";
+                port = 0;
+                speed = 200000;
+                scl_pin = 4;
+                sda_pin = 5;
+                use_dma = 0;
+                use_sync = 1;
+                as_master = 1;
+                address_width = 8;
+                mode = 0;
+            }
+            i2c1 {
+                match_attr = "i2c1_config";
+                port = 1;
+                speed = 200000;
+                scl_pin = 6;
+                sda_pin = 7;
+                use_dma = 0;
+                use_sync = 1;
+                as_master = 1;
+                address_width = 8;
+                mode = 0;
+            }
+        }
+    }
+}
+

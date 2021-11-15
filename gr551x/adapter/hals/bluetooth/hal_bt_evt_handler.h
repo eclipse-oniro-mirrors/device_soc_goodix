@@ -37,7 +37,7 @@ typedef struct
     void     *func;
 } ble_msg_t;
 
-void ble_tast_reg(void);
+void BleEventTaskInit(void);
 bool BleTaskMsgSend(ble_msg_t *tx_msg);
 
 

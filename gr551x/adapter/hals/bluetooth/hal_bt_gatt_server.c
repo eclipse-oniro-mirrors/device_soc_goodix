@@ -26,7 +26,10 @@ typedef struct
     cccd_info_t         *cccdInfoTab;
     uint8_t              cccdCnt;
     uint16_t            *servHandlePtr;
-    BleGattService      *servAttList;
+    BleAttribType       *attrTypeTab;
+    UuidType             uuidType;
+    unsigned char        uuid[OHOS_BLE_UUID_MAX_LEN];
+
 } servDb_info_t;
 
 
@@ -72,25 +75,32 @@ static prf_server_info_t s_servPrfInfo = {
 
 extern BtGattServerCallbacks  *g_gatt_server_callbacks;
 
-static uint16_t get_attr_handle(uint16_t serv_handle,BleGattService *srvcInfo, uint8_t char_id)
+static uint16_t get_attr_handle(int serverId, uint8_t char_id)
 {
-    BleGattAttr *attr     = srvcInfo->attrList;
-    uint16_t     handle   = serv_handle;
+    BleAttribType *attr    = s_servEnvInfo.servDb[serverId].attrTypeTab;
+    uint16_t      handle   = *s_servEnvInfo.servDb[serverId].servHandlePtr;
+    uint8_t       char_idx = 0;
 
-    for (uint8_t i = 0; i < srvcInfo->attrNum; i++)
+    for (uint8_t i = 0; i < s_servEnvInfo.servDb[serverId].attNum; i++)
     {
-        if(attr->attrType == OHOS_BLE_ATTRIB_TYPE_CHAR)
+        if (*attr == OHOS_BLE_ATTRIB_TYPE_SERVICE)
         {
-            handle += 2;
-            if (i == char_id)
-            {
-                break;
-            }
+            attr++;
+            continue;
+        }
 
-            if((attr->properties & OHOS_GATT_CHARACTER_PROPERTY_BIT_NOTIFY) ||(attr->properties & OHOS_GATT_CHARACTER_PROPERTY_BIT_INDICATE))
-            {
-                handle++;
-            }
+        handle ++;
+
+        if(*attr == OHOS_BLE_ATTRIB_TYPE_CHAR)
+        {
+            char_idx++;
+        }
+
+
+        if (char_idx == char_id)
+        {
+            handle ++;
+            break;
         }
 
         attr++;
@@ -114,10 +124,10 @@ int BleGattsDisconnect(int serverId, BdAddr bdAddr, int connId)
 int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 {
     gatts_noti_ind_t noti_ind;
+    uint16_t err_code;
 
     uint8_t char_id = param->attrHandle - *s_servEnvInfo.servDb[serverId].servHandlePtr;
-    uint16_t handle = get_attr_handle(*s_servEnvInfo.servDb[serverId].servHandlePtr, 
-    s_servEnvInfo.servDb[serverId].servAttList, char_id);
+    uint16_t handle = get_attr_handle(serverId, char_id);
 
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---handle:%d Entry!!! ", __FUNCTION__, handle);
 
@@ -126,8 +136,10 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
     noti_ind.value = param->value;
     noti_ind.handle = handle;  
 
-    if (ble_gatts_noti_ind(param->connectId, &noti_ind))
+    err_code = ble_gatts_noti_ind(param->connectId, &noti_ind);
+    if (err_code)
     {
+        APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---error:%d !!! ", __FUNCTION__, err_code);
         return OHOS_BT_STATUS_PARM_INVALID; 
     }
 
@@ -137,14 +149,6 @@ int BleGattsSendIndication(int serverId, GattsSendIndParam *param)
 int BleGattsSetEncryption(BdAddr bdAddr, BleSecAct secAct)
 {
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
-    extern uint8_t get_conn_index(BdAddr bdAddr);
-    uint8_t conn_idx = get_conn_index(bdAddr);
-
-    if (ble_sec_enc_start(conn_idx))
-    {
-        return OHOS_BT_STATUS_PARM_INVALID;
-    }
-
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -348,6 +352,7 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
     attm_desc_128_t    *attElementTab;
     BleGattOperateFunc *attOperateFunctab;
     cccd_info_t        *cccdInfoTab;
+    BleAttribType      *attrTypeTab;
     uint8_t             att_idx = 0;
     uint8_t             cccd_idx = 0;
 
@@ -360,7 +365,8 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
 
     attElementTab     = sys_malloc(sizeof(attm_desc_128_t) * att_cnt);
     attOperateFunctab = sys_malloc(sizeof(BleGattOperateFunc) * att_cnt);
-    if (NULL == attElementTab || NULL == attOperateFunctab)
+    attrTypeTab       = sys_malloc(sizeof(BleAttribType) * att_cnt);
+    if (NULL == attElementTab || NULL == attOperateFunctab || NULL == attrTypeTab)
     {
         return OHOS_BT_STATUS_NOMEM;
     }
@@ -380,11 +386,10 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
 
     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attNum            = att_cnt;
     s_servEnvInfo.servDb[s_servEnvInfo.servNum].cccdCnt           = cccd_cnt;
-    s_servEnvInfo.servDb[s_servEnvInfo.servNum].servAttList       = srvcInfo;
     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attElementTab     = attElementTab;
     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attOperateFunctab = attOperateFunctab;
-    s_servEnvInfo.servDb[s_servEnvInfo.servNum].cccdInfoTab      = cccdInfoTab;
-
+    s_servEnvInfo.servDb[s_servEnvInfo.servNum].cccdInfoTab       = cccdInfoTab;
+    s_servEnvInfo.servDb[s_servEnvInfo.servNum].attrTypeTab       = attrTypeTab;
 
     s_servEnvInfo.servDb[s_servEnvInfo.servNum].servHandlePtr = srvcHandle;
 
@@ -393,15 +398,22 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
         switch(srvcInfo->attrList[i].attrType)
         {
             case OHOS_BLE_ATTRIB_TYPE_SERVICE:
+                memcpy(s_servEnvInfo.servDb[s_servEnvInfo.servNum].uuid, srvcInfo->attrList[i].uuid, 
+                OHOS_BLE_UUID_MAX_LEN);
+                s_servEnvInfo.servDb[s_servEnvInfo.servNum].uuidType = srvcInfo->attrList[i].uuidType;
                 ServDeclAttStore(&srvcInfo->attrList[i], attElementTab, att_idx);
+                attrTypeTab[att_idx] = OHOS_BLE_ATTRIB_TYPE_SERVICE;
                 att_idx++;
                 break;
             case OHOS_BLE_ATTRIB_TYPE_CHAR:
                 CharDeclAttStore(&srvcInfo->attrList[i], attElementTab, att_idx);
+                attrTypeTab[att_idx] = OHOS_BLE_ATTRIB_TYPE_CHAR;
                 att_idx++;
                 CharValueAttStore(&srvcInfo->attrList[i], attElementTab, att_idx);
+                attrTypeTab[att_idx] = OHOS_BLE_ATTRIB_TYPE_CHAR_VALUE;
                 memcpy(&s_servEnvInfo.servDb[s_servEnvInfo.servNum].attOperateFunctab[att_idx], &srvcInfo->attrList[i].func, sizeof(BleGattOperateFunc));
-                APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>service id %d, att id %d, read:%p, write:%p, indicate:%p", s_servEnvInfo.servNum, att_idx,
+                APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>service id %d, att id %d, read:%p, write:%p, indicate:%p", 
+                    s_servEnvInfo.servNum, att_idx,
                     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attOperateFunctab[att_idx].read,
                     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attOperateFunctab[att_idx].write,
                     s_servEnvInfo.servDb[s_servEnvInfo.servNum].attOperateFunctab[att_idx].indicate);
@@ -412,12 +424,14 @@ int BleGattsStartServiceEx(int *srvcHandle, BleGattService *srvcInfo)
                     cccdInfoTab[cccd_idx].cccd_val = 0;
                     cccdInfoTab[cccd_idx].offset   = att_idx;
                     CharCccdAttStore(&srvcInfo->attrList[i], attElementTab, att_idx);
+                    attrTypeTab[att_idx] = OHOS_BLE_ATTRIB_TYPE_CHAR_CLIENT_CONFIG;
                     att_idx++;
                     cccd_idx++;	
                 }
                 break;
             case OHOS_BLE_ATTRIB_TYPE_CHAR_USER_DESCR:
                 CharCudAttStore(&srvcInfo->attrList[i], attElementTab, att_idx);
+                attrTypeTab[att_idx] = OHOS_BLE_ATTRIB_TYPE_CHAR_USER_DESCR;
                 att_idx++;
                 break;
         }
@@ -453,10 +467,10 @@ static ble_err_t ServDbLoad(void)
     *(s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].servHandlePtr) = 0x0000;
 
     gatts_db.shdl                  = s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].servHandlePtr;
-    gatts_db.uuid                  = s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].servAttList->attrList[0].uuid;
+    gatts_db.uuid                  = s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].uuid;
     gatts_db.attr_tab_cfg          = NULL;
     gatts_db.max_nb_attr           = s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].attNum;
-    if (s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].servAttList->attrList[0].uuidType == OHOS_UUID_TYPE_128_BIT)
+    if (s_servEnvInfo.servDb[s_servEnvInfo.servRegIdx].uuidType == OHOS_UUID_TYPE_128_BIT)
     {
         gatts_db.srvc_perm         = SRVC_UUID_TYPE_SET(UUID_TYPE_128);
     }
@@ -626,5 +640,6 @@ static void ServGattsNtfIndCb(uint8_t connIdx, uint8_t status, const ble_gatts_n
          }
     }
 }
+
 
 
