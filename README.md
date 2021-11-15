@@ -42,14 +42,13 @@ GR5515 Starter Kit（以下简称GR5515 SK）套件是基于的GR551x芯片（�
 
 ### 下载系统
 
-笔者使用的系统版本标签是1.1.2_LTS（基于1.0.1_release分支），仅在此版本进行了验证，建议读者下载此版本的源码。
+笔者使用的系统版本标签是3.0.0_LTS，仅在此版本进行了验证，建议读者下载此版本的源码。
 
-步骤1，步骤2选择其中一步进行。
+源码下载步骤：
 
-1. 下载1.1.2_LTS指定标签的命令为：`repo init -u https://gitee.com/openharmony/manifest.git -b refs/tags/OpenHarmony-v1.1.2-LTS --no-repo-verify`。
-2. 打包下载所有文件，此时默认的Harmony版本为1.0.1_release：`repo init -u https://gitee.com/openharmony-sig/manifest.git -b OpenHarmony_1.0.1_release --no-repo-verify -m devboard_gr5515.xml`。
-3. 下载好仓库后，输入：`repo sync -c`，也就是下载当前分支的代码。
-4. 下载好代码后，输入：`repo forall -c 'git lfs pull'`，下载部分大容量二进制文件。
+1. 打包下载所有文件，此时默认的Harmony版本为3.0.0_LTS：`repo init -u https://gitee.com/openharmony-sig/manifest.git -b OpenHarmony-3.0-LTS --no-repo-verify -m devboard_gr5515.xml`。
+2. 下载好仓库后，输入：`repo sync -c`，也就是下载当前分支的代码。
+3. 下载好代码后，输入：`repo forall -c 'git lfs pull'`，下载部分大容量二进制文件。
 
 
 
@@ -71,16 +70,13 @@ user:~/Harmony/device$ tree -L 3
 .
 └── goodix
     └── gr551x
-        ├── adapter          # 外设驱动、BLE、文件系统适配。
-        ├── BUILD.gn         # GN构建脚本。
-        ├── Core             # SDK平台适配。
-        ├── gr551x.ld        # 工程链接脚本。
-        ├── GR551x_SDK       # GR5515 SDK包。
-        ├── liteos_m         # GCC编译选项。
-        ├── ohosdemo         # OS例程。
-        ├── sdk_main.c       # OS适配入口。
-        └── target_config.h  # OS裁剪配置头文件。
-
+        ├── adapter             # 外设驱动、BLE、文件系统适配
+        ├── BUILD.gn            # GN构建脚本
+        ├── components          # 组件
+        ├── drivers             # HDF外设驱动
+        ├── hcs                 # 设备描述文件
+        ├── sdk_liteos          # Liteos GR551x SDK适配
+        └── tools               # 固件生成工具
 ```
 在vendor文件夹下，确保vendor文件夹目录结构如下
 
@@ -88,12 +84,19 @@ user:~/Harmony/device$ tree -L 3
 user:~/Harmony/vendor$ tree -L 3
 .
 └── goodix
-    └── gr5515_sk
-        ├── bin_create.py   # 目标文件处理脚本。
-        ├── BUILD.gn        # GN构建脚本。
-        ├── config.json     # 子系统裁配置裁剪脚本。
-        ├── hals            # 产品参数配置。
-        └── user            # 产品应用。
+    ├── gr5515_sk_iotlink_demo   # BLE IOT应用示例工程
+    │   ├── BUILD.gn             # GN构建脚本
+    │   ├── config.json          # 子系统裁配置裁剪脚本
+    │   ├── hals                 # 产品参数配置
+    │   ├── patches              # 源码补丁
+    │   └── patch.yml            # 补丁执行脚本
+    └── gr5515_sk_xts_demo       # XTS测试示例工程
+        ├── BUILD.gn             # GN构建脚本
+        ├── config.json          # 子系统裁配置裁剪脚本
+        ├── tests                # 测试用例
+        ├── hals                 # 产品参数配置
+        ├── patches              # 源码补丁
+        └── patch.yml            # 补丁执行脚本
 ```
 
 ## 设置编译工具链
@@ -107,17 +110,22 @@ user:~/Harmony/vendor$ tree -L 3
 
 进入源码根目录编译工程
 
-   ​	`hb set`       选择gr5515_sk
+   ​	`hb set -root .`   选择当前路径为工程根目录
 
-   ​	`hb build -f`  编译通过，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
+   ​	`hb set -p `       选择工程
 
-## 镜像烧录
+    goodix
+        >gr5515_sk_iotlink_demo
+         gr5515_sk_xts_demo
 
-生成的镜像位于out/gr551x/gr551x_sk/bin，固件转换工具位于device/goodix/gr551x/GR551x_SDK/tools目录下，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
+   ​	`hb build -f --patch`  打patch并开始编译，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
 
-1. 将device/goodix/gr551x/GR551x_SDK目录下tools文件夹拷贝到Windows下，然后将out/gr551x/gr551x_sk/bin目录下的application.bin拷贝到tools文件夹。
-2. 在tools目录下，点击after_build.bat脚本，对原始的application.bin进行转换处理，转换后固件输出到当前目录的ble_tool_bin文件夹下，application_fw.bin即是待烧录的最终固件。
-3. 到Goodix官网下载最新的固件烧录工具GProgrammer和对应的指导文档手册，安装后按照文档进行固件烧录。
+## 固件烧录
+
+生成的固件位于out/gr551x/${Project_name}/bin/application_fw.bin，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
+
+1. 将固件拷贝至Windows目录下；
+2. 到Goodix官网下载最新的固件烧录工具GProgrammer.exe和对应的指导文档手册，安装后按照文档指导进行固件烧录。
 
 ## 相关仓库
 

@@ -11,7 +11,7 @@
 
 
 #define CN_BLE_EVENT_TASK_STACKSIZE  0X4000
-#define CN_BLE_EVENT_TASK_PRIOR      2
+#define CN_BLE_EVENT_TASK_PRIOR      16
 #define CN_BLE_EVENT_TASK_NAME       "BLE_EVENT"
 
 #define BLE_MSG_QUEUE_LEN   5
@@ -31,7 +31,7 @@ static void AppSecEncryptReqHandler(ble_msg_t *msg);
 static void AppGattsNtyIndHandler(ble_msg_t *msg);
 
 
-void ble_tast_reg(void)
+void BleEventTaskInit(void)
 {
     UINT32 uwRet;
     UINT32 taskID;
@@ -54,8 +54,6 @@ void ble_tast_reg(void)
 
 bool BleTaskMsgSend(ble_msg_t *tx_msg)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---%d Entry!!! ", __FUNCTION__, tx_msg->msg_type);
-
     UINT32 uwRet;
     uwRet = LOS_QueueWriteCopy(g_bleMsgHandle, tx_msg, sizeof(ble_msg_t), 0);
     if (uwRet != LOS_OK) {
@@ -77,11 +75,9 @@ static void BleEventTask(void)
         uwRet = LOS_QueueReadCopy(g_bleMsgHandle, &rx_msg, &msg_size, LOS_WAIT_FOREVER);
         if (uwRet != LOS_OK) 
         {
-            APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>LOS_QueueReadCopy fail %d",uwRet);
             continue;
         }
 
-        APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>LOS_QueueReadCopy msg_type %d",rx_msg.msg_type);
         switch (rx_msg.msg_type)
         {
             case BLE_MSG_START_ADV:

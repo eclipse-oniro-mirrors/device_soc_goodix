@@ -3,18 +3,35 @@
 #include "app_lfs.h"
 #include "string.h"
 #include "stdio.h"
+#include "dirent.h"
 #include <cmsis_os2.h>
 #include "app_log.h"
 
 #define MaxOpenFile  32
 #define FR_OK        0
 
+#ifndef FS_MAX_OPEN_DIRS
+#define FS_MAX_OPEN_DIRS     4
+#endif /* FS_MAX_OPEN_DIRS */
+
+#define DT_DIR       4
+#define DT_REG       8
+
+typedef int mode_t;
 typedef struct _File_Context {
     app_lfs_file_id_t file;
     unsigned char fd;
 } File_Context;
 
+typedef struct _DIR_Context {
+    app_lfs_dir_id_t dir;
+    unsigned char fd;
+} DIR_Context;
+
 static File_Context File[MaxOpenFile] = { 0 };
+static DIR_Context g_dir[FS_MAX_OPEN_DIRS] = {0};
+static uint32_t g_dirNum = 0;
+static struct dirent g_retValue;
 static osMutexId_t fs_mutex;
 
 static int fs_lock(void)
@@ -23,7 +40,7 @@ static int fs_lock(void)
 
     ret = osMutexAcquire(fs_mutex, osWaitForever);
     if (ret != osOK) {
-         APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] lock failed!");
+        APP_LOG_ERROR("[LFS] lock failed!!!");
     }
     return ret;
 }
@@ -38,12 +55,13 @@ void FileSystemInit(void)
     int ret = 0;
     fs_mutex = osMutexNew(NULL);
     if (fs_mutex == NULL) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File system mutex init failed!");
+        APP_LOG_ERROR("[LFS] File system mutex init failed!!!");
     }
 
     //app_lfs_format();
-    ret = app_lfs_init(); {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File system init failed! ret=%d", ret);
+    ret = app_lfs_init(); 
+    if (ret != 0) {
+        APP_LOG_ERROR("[LFS] File system init failed! ret=%d", ret);
     }
 }
 
@@ -117,34 +135,30 @@ static char *get_file_name(const char *path)
 
 int HalFileOpen(const char *path, int oflag, int mode)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---%s Entry!!! ", __FUNCTION__, path);
     int ret = 0;
     int fd  = 0;
     char *file_name;
 
     if (strlen(path) >= 40) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>path name is too long!!!");
         return -1;
     }
 
     file_name = get_file_name(path);
     if (file_name == NULL) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File name is NULL");
+        APP_LOG_ERROR("[LFS] File name is NULL!!!");
         return -1;
     }
 
     fs_lock();
     fd = Find_Free_Num();
     if (fd == 0) {
-        APP_LOG_ERROR("NO enougn file Space!");
+        APP_LOG_ERROR("NO enougn file Space!!!");
         fs_unlock();
         return -1;
     }
 
-    // printf("Open file=%s", file_name);
     ret = app_lfs_file_open(&File[fd - 1].file, file_name, ReadModeChange(oflag));
     if (ret != FR_OK) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File open failed! ret=%d", ret);
         fs_unlock();
         return -1;
     }
@@ -157,14 +171,12 @@ int HalFileOpen(const char *path, int oflag, int mode)
 
 int HalFileClose(int fd)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
     if ((fd > MaxOpenFile) || (fd <= 0)) {
         return -1;
     }
 
     fs_lock();
     if (app_lfs_file_close(&File[fd - 1].file) != FR_OK) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File close failed %d", fd);
         fs_unlock();
         return -1;
     }
@@ -177,7 +189,6 @@ int HalFileClose(int fd)
 
 int HalFileRead(int fd, char *buf, unsigned int len)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
     int ret = 0;
 
     if ((fd > MaxOpenFile) || (fd <= 0)) {
@@ -187,13 +198,21 @@ int HalFileRead(int fd, char *buf, unsigned int len)
     fs_lock();
     ret = app_lfs_file_read(&File[fd - 1].file, (uint8_t *)buf, len);
     fs_unlock();
-
+	for (int i = 0; i < ret; i++)
+	{
+		printf("0x%02x ", (unsigned char)buf[i]);
+	}
+	printf("\r\n");
     return ret;
 }
 
 int HalFileWrite(int fd, const char *buf, unsigned int len)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
+	for (int i = 0; i < len; i++)
+	{
+		printf("0x%02x ", (unsigned char)buf[i]);
+	}
+        printf("\r\n");
     int ret = 0;
 
     if ((fd > MaxOpenFile) || (fd <= 0)) {
@@ -209,18 +228,17 @@ int HalFileWrite(int fd, const char *buf, unsigned int len)
 
 int HalFileDelete(const char *path)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
     int ret = -1;
     char *file_name;
 
     if (strlen(path) >= APP_LFS_PATH_MAX) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>path name is too long!!!");
+        APP_LOG_ERROR("path name is too long!!!");
         return -1;
     }
 
     file_name = get_file_name(path);
     if (file_name == NULL) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File name is NULL");
+        APP_LOG_ERROR("[LFS] File name is NULL!!!");
         return -1;
     }
 
@@ -233,19 +251,18 @@ int HalFileDelete(const char *path)
 
 int HalFileStat(const char *path, unsigned int *fileSize)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
     int ret = -1;
     app_lfs_info_t info;
     char *file_name;
 
     if (strlen(path) >= APP_LFS_PATH_MAX) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>path name is too long!!!");
+       APP_LOG_ERROR("path name is too long!!!");
         return -1;
     }
 
     file_name = get_file_name(path);
     if (file_name == NULL) {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>[LFS] File name is NULL");
+        APP_LOG_ERROR("[LFS] File name is NULL!!!");
         return -1;
     }
 
@@ -254,13 +271,12 @@ int HalFileStat(const char *path, unsigned int *fileSize)
     fs_unlock();
 
     *fileSize = info.size;
-
     return ((ret == 0) ? 0 : -1);
 }
 
+
 int HalFileSeek(int fd, int offset, unsigned int whence)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
     int ret = 0;
     unsigned int flags = 0;
     uint32_t file_size = 0;
@@ -290,17 +306,149 @@ int HalFileSeek(int fd, int offset, unsigned int whence)
     } else if (whence == SEEK_END_FS) {
         flags = LFS_SEEK_END;
     } else {
-        APP_LOG_ERROR(">>>>>>>>>>>>>>>>>>>>>>>>>>unknown whence: %u", whence);
         ret =  -1;
         goto exit;
     }
 
-    if (app_lfs_file_seek(&File[fd - 1].file, offset, flags) < 0) {
+    if ((ret = app_lfs_file_seek(&File[fd - 1].file, offset, flags)) < 0) {
         ret = -1;
     }
 
 exit:
     fs_unlock();
     return ret;
+}
+
+int fsync(int fd)
+{
+    int ret = 0;
+
+    if ((fd > MaxOpenFile) || (fd <= 0)) {
+        return -1;
+    }
+
+    fs_lock();
+    ret = app_lfs_file_sync(&File[fd - 1].file);
+    if (ret != 0) {
+        fs_unlock();
+        return -1;
+    }
+    fs_unlock();
+
+    return ret;
+}
+
+int mkdir(const char *path, mode_t mode)
+{
+    int ret = 0;
+
+    if ((strlen(path) >= APP_LFS_PATH_MAX) || (path == NULL)) {
+        APP_LOG_ERROR("path name is too long!!!");
+        return -1;
+    }
+
+    fs_lock();
+    ret = app_lfs_mkdir(path);
+    if (ret != 0) {
+        fs_unlock();
+        return -1;
+    }
+    fs_unlock();
+
+    return 0;
+}
+
+DIR *opendir(const char *dirName)
+{
+    int ret = 0;
+    int i;
+    uint32_t openNum = 0;
+
+    if (dirName == NULL) {
+        return NULL;
+    }
+
+    if (g_dirNum >= FS_MAX_OPEN_DIRS) {
+        APP_LOG_ERROR("[LFS] opendir g_dirNum err 0x%x!!!", g_dirNum);
+        return NULL;
+    }
+
+    for (i = 0; i < FS_MAX_OPEN_DIRS; i++) {
+        if (g_dir[i].fd == 0) {
+            openNum = i;
+            break;
+        }
+    }
+
+    if (i >= FS_MAX_OPEN_DIRS) {
+        APP_LOG_ERROR("[LFS] dir opennum is out of range 0x%x!!!", openNum);
+        return NULL;
+    }
+
+    fs_lock();
+    ret = app_lfs_dir_open(&g_dir[openNum].dir, dirName);
+    if (ret != 0) {
+        fs_unlock();
+        return NULL;
+    }
+
+    g_dir[openNum].fd = 1;
+    g_dirNum++;
+    fs_unlock();
+
+    return (DIR *)&g_dir[openNum];
+}
+
+struct dirent *readdir(DIR *dir)
+{
+    int ret = 0;
+    app_lfs_info_t dir_info = {0};
+    DIR_Context *p_dir_context = (DIR_Context *)dir;
+
+    if (dir == NULL) {
+        return NULL;
+    }
+
+    fs_lock();
+    ret = app_lfs_dir_read(&p_dir_context->dir, &dir_info);
+    if (ret != true) {
+        fs_unlock();
+        return NULL;
+    }
+
+    memcpy(g_retValue.d_name, dir_info.name, sizeof(g_retValue.d_name));
+
+    if (dir_info.type == LFS_TYPE_DIR) {
+        g_retValue.d_type = DT_DIR;
+    } else  {
+        g_retValue.d_type = DT_REG;
+    }
+
+    fs_unlock();
+
+    return &g_retValue;
+}
+
+int closedir(DIR *dir)
+{
+    int ret = 0;
+    DIR_Context *p_dir_context = (DIR_Context *)dir;
+
+    if (dir == NULL) {
+        return -1;
+    }
+
+    fs_lock();
+    ret = app_lfs_dir_close(&p_dir_context->dir);
+    if (ret != 0) {
+        fs_unlock();
+        return -1;
+    }
+
+    g_dirNum--;
+    memset(p_dir_context, 0x00, sizeof(DIR_Context));
+    fs_unlock();
+
+    return 0;
 }
 

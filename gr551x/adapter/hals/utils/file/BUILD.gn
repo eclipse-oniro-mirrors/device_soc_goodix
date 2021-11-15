@@ -15,16 +15,12 @@ import("//build/lite/config/component/lite_component.gni")
 
 static_library("hal_file_static") {
   sources = [
-    "src/lfs.c",
-    "src/lfs_util.c",
-    "src/app_lfs.c",
     "src/hal_file.c", 
     "src/posix_fs.c", 
   ]
 
   include_dirs = [
     "//utils/native/lite/hals/file",
-    "//device/goodix/gr551x/adapter/hals/utils/file/inc",
   ]
 }
 

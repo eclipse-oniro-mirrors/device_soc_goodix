@@ -95,7 +95,18 @@ uint8_t get_conn_index(BdAddr bdAddr)
 
 static void ble_init_cmp_callback(void)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>BLE Stack Startup!!! ");
+    uint8_t   addr[6];
+    uint16_t  lenght = 6;
+
+    if (!nvds_get(0xC001, &lenght, (uint8_t*)addr))
+    {
+        gap_bdaddr_t ble_addr;
+
+        ble_addr.addr_type = 0;
+        memcpy(ble_addr.gap_addr.addr, (uint8_t*)addr, 6);
+	ble_gap_addr_set(&ble_addr);
+    }
     ble_gap_pair_enable(true);
     ble_sec_params_set(&s_sec_param);
     ble_gap_privacy_params_set(900, true);
@@ -131,11 +142,6 @@ int DisableBtStack(void)
 int SetDeviceName(const char *name, unsigned int len)
 {
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
-    if (ble_gap_device_name_set(BLE_GAP_WRITE_PERM_NOAUTH, (uint8_t *)name,  len))
-    {
-        return OHOS_BT_STATUS_PARM_INVALID;
-    }
-
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -317,31 +323,47 @@ int BleGattSecurityRsp(BdAddr bdAddr, bool accept)
 int GetDeviceMacAddress(unsigned char* result)
 {
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
+    uint8_t   addr[6];
+    uint16_t  lenght = 6;
     if (result == NULL) {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
-    if (sys_device_addr_get((uint8_t*)result))
+    if (nvds_get(0xC001, &lenght, (uint8_t*)addr))
     {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
+    result[0] = addr[5];
+    result[1] = addr[4];
+    result[2] = addr[3];
+    result[3] = addr[2];
+    result[4] = addr[1];
+    result[5] = addr[0];
     return OHOS_BT_STATUS_SUCCESS;
 }
 
 int ReadBtMacAddr(unsigned char *mac, unsigned int len)
 {
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
+    uint8_t   addr[6];
+    uint16_t  lenght = 6;
     if (mac == NULL || len < 6)
     {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
-    if (sys_device_addr_get((uint8_t*)mac))
+    if (nvds_get(0xC001, &lenght, (uint8_t*)addr))
     {
         return OHOS_BT_STATUS_PARM_INVALID;
     }
 
+    mac[0] = addr[5];
+    mac[1] = addr[4];
+    mac[2] = addr[3];
+    mac[3] = addr[2];
+    mac[4] = addr[1];
+    mac[5] = addr[0];
     return OHOS_BT_STATUS_SUCCESS;
 }
 
@@ -516,7 +538,7 @@ static void app_gap_connection_update_req_cb(uint8_t conn_idx, const gap_conn_pa
 
 static void app_gatt_mtu_exchange_cb(uint8_t conn_idx, uint8_t status, uint16_t mtu)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---mtu:%d--- Entry!!! ", __FUNCTION__, mtu);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>MTU exchanged to :%d!!! ", mtu);
     if (g_gatt_server_callbacks && g_gatt_server_callbacks->mtuChangeCb && !status)
     {
         ble_msg_t tx_msg = 
