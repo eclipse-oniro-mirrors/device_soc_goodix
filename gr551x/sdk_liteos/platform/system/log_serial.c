@@ -82,12 +82,28 @@ void bsp_log_init(void)
 
 __attribute__((weak)) int _read(int file, char *ptr, int len)
 {
-	return 0;
+    return 0;
 }
 
 __attribute__((weak)) int _write(int file, char *ptr, int len)
 {
     bsp_uart_send(ptr, len);
-	return len;
+    return len;
 }
 
+int HiLogWriteInternal(const char *buffer, size_t bufLen)
+{
+    if (!buffer)
+        return -1;
+    // because it's called as HiLogWriteInternal(buf, strlen(buf) + 1)
+    if (bufLen < 2)
+        return 0;
+    if (buffer[bufLen - 2] != '\n') {
+        *((char *)buffer + bufLen - 1) = '\n';
+    } else {
+        bufLen--;
+    }
+    int ret = app_uart_transmit_sync(LOG_UART_ID, buffer, bufLen, 1000);
+
+    return ret;
+}

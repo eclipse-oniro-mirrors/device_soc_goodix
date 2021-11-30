@@ -60,8 +60,7 @@ int app_lfs_device_sync(const struct lfs_config *c);
 static uint32_t s_app_lfs_start_addr;
 static lfs_t    s_app_lfs_instance;
 
-
-static const struct lfs_config s_app_lfs_cfg = 
+static struct lfs_config s_app_lfs_cfg = 
 {
     .context        = NULL,
     .read           = app_lfs_block_read,
@@ -71,7 +70,6 @@ static const struct lfs_config s_app_lfs_cfg =
     .read_size      = APP_LFS_READ_SIZE,
     .prog_size      = APP_LFS_PROG_SIZE,
     .block_size     = APP_LFS_BLOCK_SIZE,
-    .block_count    = APP_LFS_BLOCK_COUNT,
     .block_cycles   = APP_LFS_BLOCK_CYCLES,
     .cache_size     = APP_LFS_CACHE_SIZE,
     .lookahead_size = APP_LFS_LOOKAHEAD_SIZE,
@@ -90,8 +88,8 @@ static void s_lfs_start_addr_get(void)
     hal_flash_get_info(&flash_id, &flash_size);
 
     nvds_start_addr = APP_LFS_FLASH_BASE + flash_size - hal_flash_sector_size() * NVDS_NUM_SECTOR;
-    s_app_lfs_start_addr  = nvds_start_addr - APP_LFS_BLOCK_COUNT * APP_LFS_BLOCK_SIZE;
-    APP_LOG_INFO("LFS Flash start addr=0x%x, All size=%dKB", s_app_lfs_start_addr, APP_LFS_BLOCK_COUNT * APP_LFS_BLOCK_SIZE / 1024);
+    s_app_lfs_start_addr  = nvds_start_addr - s_app_lfs_cfg.block_count * APP_LFS_BLOCK_SIZE;
+    APP_LOG_INFO("LFS Flash start addr=0x%x, All size=%dKB", s_app_lfs_start_addr, s_app_lfs_cfg.block_count * APP_LFS_BLOCK_SIZE / 1024);
 }
 
 int app_lfs_block_read(const struct lfs_config *c, lfs_block_t block, lfs_off_t off, void *buffer, lfs_size_t size)
@@ -147,10 +145,11 @@ int app_lfs_device_sync(const struct lfs_config *c)
  * GLOBAL FUNCTION DEFINITIONS
  *****************************************************************************************
  */
-int app_lfs_init(void)
+int app_lfs_init(int lfs_block_count)
 {
     int error_code = APP_LFS_ERR_OK;
 
+    s_app_lfs_cfg.block_count = lfs_block_count;
     error_code = lfs_mount(&s_app_lfs_instance, &s_app_lfs_cfg);
     if (LFS_ERR_OK != error_code)
     {

@@ -71,10 +71,6 @@
 #define APP_LFS_BLOCK_CYCLES        500
 #endif
 
-#ifndef APP_LFS_BLOCK_COUNT
-#define APP_LFS_BLOCK_COUNT         10
-#endif
-
 #ifndef APP_LFS_LOOKAHEAD_SIZE
 #define APP_LFS_LOOKAHEAD_SIZE      32
 #endif
@@ -137,10 +133,12 @@ typedef void (*app_lfs_traverse_cb_t)(char *name, uint32_t size);
  *****************************************************************************************
  * @brief Initialize APP Little File System instance.
  *
+ * @param[in] lfs_block_count: Number of flash blocks used by the LFS file system.
+ * 
  * @return Result of initialization.
  *****************************************************************************************
  */
-int app_lfs_init(void);
+int app_lfs_init(int lfs_block_count);
 
 /**
  *****************************************************************************************

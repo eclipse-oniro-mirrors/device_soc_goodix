@@ -13,21 +13,12 @@
 
 import("//build/lite/config/subsystem/lite_subsystem.gni")
 import("//build/lite/config/component/lite_component.gni")
+import("//kernel/liteos_m/liteos.gni")
 
 copy("link-script") {
     sources = [ "sdk_liteos/platform/startup/gr551x.ld"]
     outputs = [ "$root_build_dir/bin/link.ld" ]
 }
-
-copy("hilink_btsdk_lib") {
-     sources = [ "components/hilink/debug/libhilinkbtsdk.a"]
-     outputs = [ "$root_build_dir/libs/libhilinkbtsdk.a" ]
- }
-
-copy("hichain_lib") {
-     sources = [ "components/hichain/libhichain_account.a"]
-     outputs = [ "$root_build_dir/libs/libhichain_account.a" ]
- }
 
 copy("sdk_lib") {
      sources = [ "sdk_liteos/gr551x_sdk/components/sdk/linker/lib_gcc/libble_sdk.a"]
@@ -94,17 +85,24 @@ source_set("device_soc"){
 
     deps = [
         ":link-script",
-        ":sdk_lib",
-        ":hilink_btsdk_lib",
-        ":hichain_lib",
-        ":rom_symbol",
-        "//kernel/liteos_m:kernel",
+        ":sdk_lib",        
+        ":rom_symbol",        
         "//build/lite/config/component/cJSON:cjson_static",
+        "//base/hiviewdfx/hilog_lite/frameworks/featured:hilog_static"
     ]
 }
 
-group("gr551x") {
+source_set("hdf_drivers") {
+    deps = [
+        "drivers:drivers",
+    ]
+}
+
+module_name = get_path_info(rebase_path("."), "name")
+module_group(module_name) {
+    modules = [ ]
     deps = [
         ":device_soc",
+        ":hdf_drivers",
     ]
 }

@@ -27,7 +27,7 @@
 #define CN_BLE_EVENT_TASK_PRIOR      16
 #define CN_BLE_EVENT_TASK_NAME       "BLE_EVENT"
 
-#define BLE_MSG_QUEUE_LEN   5
+#define BLE_MSG_QUEUE_LEN   16
 #define BLE_MSG_INFO_SIZE   sizeof(ble_msg_t)
 
 static uint32_t g_bleMsgHandle;

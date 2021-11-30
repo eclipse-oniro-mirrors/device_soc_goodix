@@ -334,6 +334,29 @@ int BleGattSecurityRsp(BdAddr bdAddr, bool accept)
     return OHOS_BT_STATUS_SUCCESS;
 }
 
+int HILINK_BT_GetMacAddr(unsigned char* result, unsigned int length)
+{
+    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
+    uint8_t   addr[6];
+    uint16_t  lenght = 6;
+    if (result == NULL) {
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    if (nvds_get(0xC001, &lenght, (uint8_t*)addr))
+    {
+        return OHOS_BT_STATUS_PARM_INVALID;
+    }
+
+    result[0] = addr[5];
+    result[1] = addr[4];
+    result[2] = addr[3];
+    result[3] = addr[2];
+    result[4] = addr[1];
+    result[5] = addr[0];
+    return OHOS_BT_STATUS_SUCCESS;
+}
+
 int GetDeviceMacAddress(unsigned char* result)
 {
     APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- Entry!!! ", __FUNCTION__);
@@ -468,7 +491,7 @@ int BleStartAdvEx(int *advId, const StartAdvRawData rawData, BleAdvParams advPar
 
 static void app_gap_adv_start_cb(uint8_t inst_idx, uint8_t status)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---status:%d--- Entry!!! ", __FUNCTION__, status);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---status:%d--- Entry!!! ", __FUNCTION__, status);
     if (s_gatt_callbacks && s_gatt_callbacks->advEnableCb)
     {
         ble_msg_t tx_msg = 
@@ -485,7 +508,7 @@ static void app_gap_adv_start_cb(uint8_t inst_idx, uint8_t status)
 
 static void app_gap_adv_stop_cb(uint8_t inst_idx, uint8_t status, gap_stopped_reason_t reason)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- status:%d--- Entry!!! ", __FUNCTION__, status);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s--- status:%d--- Entry!!! ", __FUNCTION__, status);
     if (s_gatt_callbacks && s_gatt_callbacks->advDisableCb && GAP_STOPPED_REASON_ON_USER == reason)
     {
         ble_msg_t tx_msg = 
@@ -501,9 +524,10 @@ static void app_gap_adv_stop_cb(uint8_t inst_idx, uint8_t status, gap_stopped_re
 
 static void app_gap_connect_cb(uint8_t conn_idx, uint8_t status, const gap_conn_cmp_t *p_conn_param)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
     if (!status)
     {
+        ble_gap_phy_update(conn_idx, BLE_GAP_PHY_LE_2MBPS, BLE_GAP_PHY_LE_2MBPS, 0);
         memcpy(s_conn_info[conn_idx].peer_addr.addr, p_conn_param->peer_addr.addr, 6);
         if (g_gatt_server_callbacks && g_gatt_server_callbacks->connectServerCb)
         {
@@ -523,7 +547,7 @@ static void app_gap_connect_cb(uint8_t conn_idx, uint8_t status, const gap_conn_
 
 static void app_gap_disconnect_cb(uint8_t conn_idx, uint8_t status, uint8_t reason)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
     if (!status)
     {
         if (g_gatt_server_callbacks && g_gatt_server_callbacks->disconnectServerCb)
@@ -546,8 +570,14 @@ static void app_gap_disconnect_cb(uint8_t conn_idx, uint8_t status, uint8_t reas
 
 static void app_gap_connection_update_req_cb(uint8_t conn_idx, const gap_conn_param_t *p_conn_param_update_req)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
     ble_gap_conn_param_update_reply(conn_idx, true);
+    gap_conn_update_param_t gap_conn_param;
+    gap_conn_param.interval_min  = 6;
+    gap_conn_param.interval_max  = 6;
+    gap_conn_param.slave_latency = 0;
+    gap_conn_param.sup_timeout   = 400;
+    ble_gap_conn_param_update(conn_idx, &gap_conn_param);
 }
 
 static void app_gatt_mtu_exchange_cb(uint8_t conn_idx, uint8_t status, uint16_t mtu)
@@ -570,7 +600,7 @@ static void app_gatt_mtu_exchange_cb(uint8_t conn_idx, uint8_t status, uint16_t 
 
 static void app_sec_rcv_enc_req_cb(uint8_t conn_idx, sec_enc_req_t *p_enc_req)
 {
-    APP_LOG_DEBUG(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
+    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>%s---conn_idx:%d--- Entry!!! ", __FUNCTION__, conn_idx);
 
     s_sec_enc_req_type = p_enc_req->req_type;
 
