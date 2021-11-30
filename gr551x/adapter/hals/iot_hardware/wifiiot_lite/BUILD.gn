@@ -12,7 +12,6 @@
 # limitations under the License.
 
 static_library("hal_iothardware") {
-  if (board_name == "gr551x") {
     sources = [
       "hal_iot_flash.c",
       "hal_iot_gpio.c",
@@ -27,5 +26,4 @@ static_library("hal_iothardware") {
       "//utils/native/lite/include",
       "//base/iot_hardware/peripheral/interfaces/kits",
     ]
-  }
 }

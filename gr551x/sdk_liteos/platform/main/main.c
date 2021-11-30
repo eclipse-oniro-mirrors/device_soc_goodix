@@ -42,7 +42,7 @@ void SystemPeripheralsInit(void)
     }
 
     bsp_log_init();
-    APP_LOG_INFO(">>>>>>>>>>>>>>>>>>>>>>>>>>GR551x system start!!!");
+    APP_LOG_INFO("GR551x system start!!!");
 }
 
 /* Initialize Hardware RNG peripherals. */

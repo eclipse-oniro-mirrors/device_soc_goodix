@@ -172,11 +172,11 @@
 
 // <o> Code load address
 // <i> Default:  0x01002000
-#define APP_CODE_LOAD_ADDR      0x01002000
+#define APP_CODE_LOAD_ADDR      0x0100b000
 
 // <o> Code run address
 // <i> Default:  0x01002000
-#define APP_CODE_RUN_ADDR       0x01002000
+#define APP_CODE_RUN_ADDR       0x0100b000
 
 // <ol.0..5> System clock
 // <0=> 64MHZ

@@ -25,11 +25,12 @@
 /* Entry Point */
 ENTRY(Reset_Handler)
 
-/* Highest address of the user mode stack */
-_estack = ORIGIN(RAM) + LENGTH(RAM);	/* end of "RAM" Ram type memory */
-
 _Min_Heap_Size = 0x800;	  /* required amount of heap  */
 _Min_Stack_Size = 0x2000;	/* required amount of stack */
+
+/* Highest address of the user mode stack */
+_estack = ORIGIN(RAM) + LENGTH(RAM);	/* end of "RAM" Ram type memory */
+_sstack = _estack - _Min_Stack_Size;
 
 /* Memories definition */
 MEMORY
@@ -54,7 +55,7 @@ SECTIONS
   .text :
   {
     . = ALIGN(4);
-
+    _stext = .;
     *(.text)           /* .text sections (code) */
     *(.text*)          /* .text* sections (code) */
     *(.glue_7)         /* glue arm to thumb code */
@@ -191,6 +192,12 @@ SECTIONS
     . = ALIGN(4);
   } >FLASH
 
+  .hdf_drivers_entry :
+  {
+    _hdf_drivers_start = .;
+    KEEP(*(.hdf.driver))
+    _hdf_drivers_end = .;
+  } >FLASH
 
   /* Used by the startup to initialize data */
   _sidata = LOADADDR(.data);

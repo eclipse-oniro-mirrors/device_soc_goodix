@@ -1,7 +1,3 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# author: zhangqf
-
 # Copyright (c) 2021 GOODIX.
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,6 +10,10 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+# author: zhangqf
 
 """
 This module use arm-none-eabi-xxx function to deal the xxx.elf file. we recept two parameters, and the 
@@ -29,8 +29,7 @@ import re
 import os
 import json
 
-TARGET_IMG_NAME = "application_fw"
-CUSTOM_CONFIG   = "../../../device/goodix/gr551x/sdk_liteos/config/custom_config.h"
+CUSTOM_CONFIG   = "../../../device/soc/goodix/gr551x/sdk_liteos/config/custom_config.h"
 
 BufSize = 1024
 PatternValue = 0x4744
@@ -323,8 +322,12 @@ class GenFirmware():
             img_info_byte = self.img_info.to_bytes()
             for x in img_info_byte:
                 f_w.write(x)
-            for i in range(MaxCommentsLen):
+            for i in range(len(self.img_info.comments)):
                 f_w.write(self.img_info.comments[i].encode('utf-8'))
+            if (len(self.img_info.comments) < MaxCommentsLen):
+                for i in range(MaxCommentsLen - len(self.img_info.comments)):
+                    pad=' ';
+                    f_w.write(str(pad).encode('utf-8'))
             for i in range(8):
                 a = 0
                 f_w.write(a.to_bytes(1, byteorder='little', signed=False))
@@ -386,11 +389,14 @@ def main(input = ""):
 def make_bin(input_file = "", output_file = "", list_file=""):
     shell_script =  '''arm-none-eabi-objcopy -O binary -S {src_file} {dst_file}'''.format(src_file = input_file, dst_file = output_file)
     cmd_output = os.system(shell_script)
+    
     main(output_file)
+
     shell_script =  '''arm-none-eabi-size {src_file}
         arm-none-eabi-objdump -D {src_file} > {list_file}'''.format(src_file = input_file, dst_file = output_file,
         list_file=list_file)
     cmd_output = os.system(shell_script)
+
     return   
 
 if __name__ == "__main__":

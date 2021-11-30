@@ -21,6 +21,7 @@
 #include "dirent.h"
 #include <cmsis_os2.h>
 #include "app_log.h"
+#include "config.h"
 
 #define MaxOpenFile  32
 #define FR_OK        0
@@ -73,8 +74,8 @@ void FileSystemInit(void)
         APP_LOG_ERROR("[LFS] File system mutex init failed!!!");
     }
 
-    //app_lfs_format();
-    ret = app_lfs_init(); 
+    app_lfs_format();
+    ret = app_lfs_init(LOSCFG_LFS_MAX_BLOCK_COUNT); 
     if (ret != 0) {
         APP_LOG_ERROR("[LFS] File system init failed! ret=%d", ret);
     }
@@ -149,7 +150,7 @@ static char *get_file_name(const char *path)
 }
 
 int HalFileOpen(const char *path, int oflag, int mode)
-{
+{    
     int ret = 0;
     int fd  = 0;
     char *file_name;
@@ -213,21 +214,12 @@ int HalFileRead(int fd, char *buf, unsigned int len)
     fs_lock();
     ret = app_lfs_file_read(&File[fd - 1].file, (uint8_t *)buf, len);
     fs_unlock();
-	for (int i = 0; i < ret; i++)
-	{
-		printf("0x%02x ", (unsigned char)buf[i]);
-	}
-	printf("\r\n");
+
     return ret;
 }
 
 int HalFileWrite(int fd, const char *buf, unsigned int len)
 {
-	for (int i = 0; i < len; i++)
-	{
-		printf("0x%02x ", (unsigned char)buf[i]);
-	}
-        printf("\r\n");
     int ret = 0;
 
     if ((fd > MaxOpenFile) || (fd <= 0)) {
@@ -285,7 +277,7 @@ int HalFileStat(const char *path, unsigned int *fileSize)
     ret = app_lfs_file_stat(file_name, &info);
     fs_unlock();
 
-    *fileSize = info.size;
+    *fileSize = info.size;    
     return ((ret == 0) ? 0 : -1);
 }
 

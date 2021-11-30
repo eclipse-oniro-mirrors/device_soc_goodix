@@ -287,6 +287,6 @@ SVC_Handler:
     BLXNE  R12
     BX  LR
 
-/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
+/*****END OF FILE****/
   
 
