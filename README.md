@@ -165,7 +165,7 @@ sudo apt-get install build-essential gcc g++ make zlib* libffi-dev e2fsprogs pkg
 
 ## 确认目录结构
 
-在device文件夹下，确保device文件夹目录结构如下
+在device文件夹下，确保device/soc目录结构如下
 
 ```shell
 user:~/Harmony/device/soc$ tree -L 3
@@ -232,7 +232,7 @@ user:~/Harmony/vendor$ tree -L 3
 
 ## 固件烧录
 
-生成的固件位于out/gr551x/${Project_name}/bin/application_fw.bin，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
+生成的固件位于out/{board_name}/{product_name}/bin/application_fw.bin，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
 
 1. 将固件拷贝至Windows目录下；
 2. 到Goodix官网下载最新的固件烧录工具GProgrammer.exe和对应的指导文档手册，安装后按照文档指导进行固件烧录。
