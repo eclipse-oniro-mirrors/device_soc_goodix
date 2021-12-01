@@ -159,7 +159,7 @@ sudo apt-get install build-essential gcc g++ make zlib* libffi-dev e2fsprogs pkg
 
 ## 获取代码流程
 
-1. 打包下载所有文件，此时默认的Harmony版本为Master：`repo init -u https://gitee.com/openharmony-sig/manifest.git -b OpenHarmony-3.0-LTS --no-repo-verify -m devboard_gr5515.xml`。
+1. 打包下载所有文件，此时默认的Harmony版本为Master：`repo init -u https://gitee.com/openharmony-sig/manifest.git -m devboard_gr5515.xml --no-repo-verify`。
 2. 下载好仓库后，输入：`repo sync -c`，也就是下载当前分支的代码。
 3. 下载好代码后，输入：`repo forall -c 'git lfs pull'`，下载部分大容量二进制文件。
 
@@ -224,8 +224,7 @@ user:~/Harmony/vendor$ tree -L 3
    ​	`hb set -p `       选择工程
 
     goodix
-        >gr5515_sk_iotlink_demo
-         gr5515_sk_xts_demo
+        >gr5515_sk_xts_demo
 
    ​	`hb build -f --patch`  打patch并开始编译，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
 
