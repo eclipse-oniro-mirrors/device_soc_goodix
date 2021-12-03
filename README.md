@@ -4,7 +4,7 @@
 
 以下内容步骤参考[quickstart-lite-env-setup-linux](https://gitee.com/openharmony/docs/blob/master/zh-cn/device-dev/quick-start/quickstart-lite-env-setup-linux.md)
 
-系统要求：Ubuntu16.04 和 Ubuntu18.04 64位系统版本。
+系统要求：Ubuntu16.04 或 Ubuntu18.04 64位系统版本。
 
 编译环境搭建包含如下几步：
 
@@ -159,16 +159,24 @@ sudo apt-get install build-essential gcc g++ make zlib* libffi-dev e2fsprogs pkg
 
 ## 获取代码流程
 
-1. 打包下载所有文件，此时默认的Harmony版本为Master：`repo init -u https://gitee.com/openharmony-sig/manifest.git -m devboard_gr5515.xml --no-repo-verify`。
-2. 下载好仓库后，输入：`repo sync -c`，也就是下载当前分支的代码。
-3. 下载好代码后，输入：`repo forall -c 'git lfs pull'`，下载部分大容量二进制文件。
+1. 新建代码存放目录(用户可以自行指定为其他目录)，并进入：
+```
+mkdir ~/openharmony
+cd ~/openharmony
+```
+2. 打包下载所有文件，此时默认的Harmony版本为Master：
+```
+`repo init -u https://gitee.com/openharmony-sig/manifest.git -m devboard_gr5515.xml --no-repo-verify`
+```
+3. 下载好仓库后，输入：`repo sync -c`，也就是下载当前分支的代码。
+4. 下载好代码后，输入：`repo forall -c 'git lfs pull'`，下载部分大容量二进制文件。
 
 ## 确认目录结构
 
 在device文件夹下，确保device/soc目录结构如下
 
 ```shell
-user:~/Harmony/device/soc$ tree -L 3
+user:~/openharmony/device/soc$ tree -L 3
 .
 └── goodix
     ├── BUILD.gn                                  # GN构建脚本
@@ -189,30 +197,43 @@ user:~/Harmony/device/soc$ tree -L 3
     └── Kconfig.liteos_m.soc                      # liteos_m soc配置项
 ```
 
+在device文件夹下，确保device/board目录结构如下
+
+```shell
+user:~/openharmony/device/board$ tree -L 3
+.
+└── goodix
+    ├── BUILD.gn                                  # GN构建脚本
+    ├── drivers                                   # 板级驱动存放目录
+    │   └── BUILD.gn                              # GN构建脚本
+    ├── gr5515_sk                                 # GR5515 Starter Kit开发板配置目录
+    │   ├── BUILD.gn                              # GN构建脚本
+    │   ├── gr5515_sk_defconfig                   # GR5515 Starter Kit Kconfig默认配置
+    │   ├── Kconfig.liteos_m.board                # Board liteos_m Kconfig配置项
+    │   ├── Kconfig.liteos_m.defconfig.board      # Board liteos_m Kconfig默认配置
+    │   └── liteos_m                              # 构建脚本目录
+    ├── hcs                                       # hcs硬件描述配置目录
+    │   ├── BUILD.gn                              # GN构建脚本
+    │   └── gr5515_sk.hcs                         # GR5515 Starter Kit hcs硬件描述脚本
+    ├── Kconfig.liteos_m.boards                   # Board liteos_m Kconfig配置项
+    └── Kconfig.liteos_m.defconfig.boards         # Board liteos_m Kconfig默认配置
+```
+
 在vendor文件夹下，确保vendor文件夹目录结构如下
 
 ```shell
-user:~/Harmony/vendor$ tree -L 3
-
+user:~/openharmony/vendor$ tree -L 3
 .
 └── goodix
-    ├── gr5515_sk_iotlink_demo   # BLE IOT应用示例工程
-    │   ├── BUILD.gn             # GN构建脚本
-    │   ├── config.json          # 子系统裁配置裁剪脚本
-    │   ├── hals                 # 产品参数配置
-    │   ├── hdf_config           # HDF硬件描述配置
-    │   ├── kernel_configs       # Kconfig配置输出
-    │   ├── patches              # 源码补丁
-    │   └── patch.yml            # 补丁执行脚本
-    └── gr5515_sk_xts_demo       # XTS测试示例工程
-        ├── BUILD.gn             # GN构建脚本
-        ├── config.json          # 子系统裁配置裁剪脚本
-        ├── tests                # 测试用例
-        ├── hals                 # 产品参数配置
-        ├── hdf_config           # HDF硬件描述配置
-        ├── kernel_configs       # Kconfig配置输出
-        ├── patches              # 源码补丁
-        └── patch.yml            # 补丁执行脚本
+    └── gr5515_sk_xts_demo                        # XTS测试示例工程
+        ├── BUILD.gn                              # GN构建脚本
+        ├── config.json                           # 子系统裁配置裁剪脚本
+        ├── tests                                 # 测试用例
+        ├── hals                                  # 产品参数配置
+        ├── hdf_config                            # HDF硬件描述配置
+        ├── kernel_configs                        # Kconfig配置输出
+        ├── patches                               # 源码补丁
+        └── patch.yml                             # 补丁执行脚本
 ```
 
 ## 编译工程
@@ -356,8 +377,63 @@ GProgrammer以图形化方式展示Flash Firmware Layout（如图下图所示）
 
 ### Linux下固件烧录
 
-1. 将固件拷贝至Windows目录下；
-2. 到Goodix官网下载最新的固件烧录工具GProgrammer.exe和对应的指导文档手册，安装后按照文档指导进行固件烧录。
+#### 1. GProgrammer获取:
+
+```
+git clone https://gitee.com/sink-top/gprogrammer-linux.git
+
+```
+#### 2. 解压：
+
+```
+cd gprogrammer-linux/
+tar -xjvf GProgrammer-1.2.15.tar.bz2
+
+```
+
+#### 3. 安装J-Link软件：
+
+```
+cd GProgrammer-1.2.15/
+sudo dpkg -i JLink_Linux_V618c_x86_64.deb
+
+```
+
+#### 4. 固件下载
+
+参考上面"编译工程"章节，选中**gr5515_sk_xts_demo**工程编译后，生成的固件存放在"~/openharmony/out/gr551x/gr5515_sk_xts_demo/bin/application_fw.bin"。
+
+##### 1. 硬件连接
+
+J-Link仿真器与开发板或者产品正确连接，且J-Link仿真器的USB与Ubuntu连接，确保Ubuntu USB列表能找到J-Link设备。
+
+##### 2. 固件下载
+
+在GProgrammer-1.2.15目录下：
+
+1. 先擦除Flash上已经存在的固件
+
+* 全部擦除，包括文件系统、NVDS区域保存的用户信息，如果用户不关心这些信息，执行此命令：
+
+```
+./GR551x_console eraseall
+```
+
+* 擦除部分区域，保留文件系统、NVDS区域保存的用户信息：
+
+```
+ ./GR551x_console erase 0x1000000 0x10c3000 y
+```
+
+上面两种擦除方式，二选一执行。
+
+2. 烧录固件：
+
+```
+ ./GR551x_console program ~/openharmony/out/gr551x/gr5515_sk_xts_demo/bin/application_fw.bin y
+```
+
+**提示：** 更多GProgrammer命令的使用，请参考[GProgrammer命令行](https://docs.goodix.com/zh/online/detail/gprogrammer_user_guide/V2.3/c2309a4b419cd3bb0d5cb6b7335c077d)
 
 ## 相关仓库
 
