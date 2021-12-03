@@ -232,7 +232,129 @@ user:~/Harmony/vendor$ tree -L 3
 
 ## 固件烧录
 
-生成的固件位于out/{board_name}/{product_name}/bin/application_fw.bin，固件烧录工具GProgrammer下载地址：https://product.goodix.com/zh/software_tool/gprogrammer 。
+生成的固件位于**out/{board_name}/{product_name}/bin/application_fw.bin**。
+
+### Windows下固件烧录
+
+#### 软件安装
+
+GProgrammer仅支持在Windows平台下安装使用，其可执行安装程序为GProgrammer Setup Version.exe。[点击下载GProgrammer](https://product.goodix.com/zh/software_tool/gprogrammer)
+
+用户可按照以下步骤安装GProgrammer：
+
+1. 双击GProgrammer的可执行安装程序GProgrammer Setup Version.exe，进入GProgrammer安装界面，然后按照安装向导提示逐步完成安装操作。
+
+![GProgrammer安装界面](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/2_1GProgrammer_insta_if.png)
+
+2. GProgrammer安装完成后，将提示用户继续安装JLink驱动，如下图所示。
+
+![安装JLink提示](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/2_2install_JLink_prom.png)
+
+3. JLink安装完成后，用户可通过桌面或开始菜单的快捷方式启动GProgrammer软件。
+
+#### 硬件连接
+
+GProgrammer既支持JLink SWD方式烧录，也支持串口方式烧录，这里推荐使用SWD连接方式。
+
+选择SWD连接方式时，用户需使用J-Link仿真器来连接PC和目标板。使用USB线将仿真器的一端与PC相连，使用杜邦线将仿真器的另一端与目标板上的芯片管脚相连。
+
+![GProgrammer安装界面](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_1Host_obj_connect.png)
+
+
+J-Link仿真器与芯片管脚的连接对应关系如下：
+
+| J-Link仿真器管脚 | GR551x芯片管脚 |
+| ---------------- | -------------- |
+| VCC              | VCC            |
+| GND              | GND            |
+| SWDIO            | GPIO_1         |
+| SWCLK            | GPIO_0         |
+
+
+**提示：** 如过用户使用的是Goodix的GR5515 Starter Kit开发板，开发板已经集成J-Link OB芯片，用户只需使用一根Micro USB 2.0线连接开发板和PC，Mirco USB用于供电以及通过J-Link进行固件烧录。
+
+#### 芯片选型
+
+启动GProgrammer后，默认进入芯片选型页面，如下图所示，根据自己产品或者开发板使用的芯片型号选择对应的芯片型号。
+
+![GProgrammer启动界面](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_4filterGR551x_soc.png)
+
+选择芯片型号后，进入主界面：
+
+![GProgrammer主界面](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_6GProgrammer_sw_if.png)
+
+软件界面的左侧为功能导航栏（具体描述见下表），右侧为功能操作区域。
+
+|                                                               图标                                                               |     	功能名称     |               描述               |
+| ------------------------------------------------------------------------------------------------------------------------------- | ------------------ | -------------------------------- |
+| ![Firmware](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_Firmware.png)         | Firmware           | 点击该图标，进入固件操作页面      |
+| ![Flash](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_Flash.png)               | Flash              | 点击该图标，进入Flash操作页面     |
+| ![Encrypt](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_encrypt_sign.png)      | Encrypt & Sign     | 点击该图标，进入加密加签操作页面   |
+| ![eFuse Layout](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_efuse_layout.png) | eFuse Layout       | 点击该图标，进入eFuse展示操作页面 |
+| ![Chip config](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_chip_config.png)   | Chip Configuration | 点击该图标，进入芯片配置操作页面   |
+| ![Device Log](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_device_log.png)     | Device Log         | 点击该图标，进入设备日志操作页面   |
+| ![Help](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_help.png)                 | Help               | 点击该图标，进入帮助操作页面      |
+
+
+#### 连接设备
+
+用户可管理控制目标板与主机之间的连接。
+
+点击软件界面右上角的![打开连接面板_灰](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_disconnect.png) ，可展开连接管理面板；再次点击![隐藏连接面板_灰](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_disconnect.png) ，可收起并隐藏该面板。
+
+GProgrammer支持SWD和串口两种连接方式。
+
+* SWD连接
+
+在SWD连接方式下，用户只需配置传输速率**Speed**，即可点击**Connect**按钮连接目标板。
+
+<img src="https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_7SWD_connect.png" width = "323" height = "450" alt="SWD连接" align=“center” />
+
+* 串口（UART）连接
+在串口（UART）连接方式下，用户可根据实际情况配置串口号Port（需点击Refresh按钮获取串口号列表，再选择正确的串口号）和波特率，其他参数默认配置不可修改。
+
+<img src="https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_8UART_connect.png" width = "323" height = "450" alt="串口连接" align=“center” />
+
+参数配置完成后，点击**Connect**按钮连接目标板。
+
+目标板连接成功后，连接管理面板将自动收起并隐藏。同时，按钮![打开连接面板_灰](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_disconnect.png)将变成![打开连接面板_彩](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_connect.png)，表示当前的连接状态为“已连接”。
+
+如需断开连接，再次点击![打开连接面板_彩](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/icon_connect.png)，打开连接管理面板，然后点击Disconnect按钮即可。
+
+<img src="https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_9disconnect.png" width = "323" height = "450" alt="断开连接" align=“center” />
+
+
+#### 固件下载
+
+GProgrammer以图形化方式展示Flash Firmware Layout（如图下图所示），可帮助用户直观了解Flash中固件区域的占用情况。
+
+![FW Flash布局](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/3_11Flash_FW_layout.png)
+
+![浅灰色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_light_gray.png)（浅灰色）：可下载的Flash空间。
+
+![深蓝色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_dark_blue.png)（深蓝色）：软件默认配置的NVDS区域。固件不能下载至该区域。
+
+![深灰色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_dark_gray.png)（深灰色）：待删除的固件，如ble_app_ancs。
+
+![浅绿色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_light_green.png)（浅绿色）：待下载的固件，如ble_app_hrs。
+
+![深绿色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_dark_green.png)（深绿色）：已存在于Flash中的固件，如ble_app_bps。
+
+![红色](https://docs.goodix.com/zh/docimg/gprogrammer_user_guide/227/gprogrammer_V2.3/zh//images/color_red.png)（红色）：两个固件的占用空间的重叠区域，如ble_app_T3u和ble_app_hts。
+
+用户下载固件时，请按以下步骤操作：
+
+1. 点击**Add**按钮，从本地添加需下载的固件文件。固件文件添加后，可查看到该固件的详细信息，例如固件文件路径、固件Image Info信息。
+
+2. 在图形化展示的Flash Firmware Layout区域中，选中要启动的固件，点击**Startup**按钮，此时该选中的固件会出现一个小火箭，表示下载成功后立即启动该固件。
+
+2. 点击**Commit**按钮，将固件文件下载到Flash。
+
+下载完成后，若Layout示意图中的固件由浅绿色变为深绿色，则表示固件下载成功。
+
+**提示：** 更详细的GProgrammer使用指导，参考[GProgrammer用户手册](https://docs.goodix.com/zh/online/detail/gprogrammer_user_guide/V2.3/49d7f26f7b5054f6b7ea83e073f8e6c6)
+
+### Linux下固件烧录
 
 1. 将固件拷贝至Windows目录下；
 2. 到Goodix官网下载最新的固件烧录工具GProgrammer.exe和对应的指导文档手册，安装后按照文档指导进行固件烧录。
