@@ -46,6 +46,7 @@
 #include "gr55xx_hal.h"
 #include "gr55xx_sys.h"
 #include "lfs.h"
+#include "config.h"
 
 /**
  * @defgroup APP_LFS_MAROC Defines
@@ -69,6 +70,10 @@
 
 #ifndef APP_LFS_BLOCK_CYCLES
 #define APP_LFS_BLOCK_CYCLES        500
+#endif
+
+#ifndef APP_LFS_BLOCK_COUNT
+#define APP_LFS_BLOCK_COUNT         LOSCFG_LFS_MAX_BLOCK_COUNT
 #endif
 
 #ifndef APP_LFS_LOOKAHEAD_SIZE
@@ -132,13 +137,11 @@ typedef void (*app_lfs_traverse_cb_t)(char *name, uint32_t size);
 /**
  *****************************************************************************************
  * @brief Initialize APP Little File System instance.
- *
- * @param[in] lfs_block_count: Number of flash blocks used by the LFS file system.
  * 
  * @return Result of initialization.
  *****************************************************************************************
  */
-int app_lfs_init(int lfs_block_count);
+int app_lfs_init(void);
 
 /**
  *****************************************************************************************
