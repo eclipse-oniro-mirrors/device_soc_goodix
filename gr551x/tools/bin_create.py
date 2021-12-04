@@ -392,10 +392,10 @@ def make_bin(input_file = "", output_file = "", list_file=""):
     
     main(output_file)
 
-    shell_script =  '''arm-none-eabi-size {src_file}
-        arm-none-eabi-objdump -D {src_file} > {list_file}'''.format(src_file = input_file, dst_file = output_file,
-        list_file=list_file)
-    cmd_output = os.system(shell_script)
+    # shell_script =  '''arm-none-eabi-size {src_file}
+    #     arm-none-eabi-objdump -D {src_file} > {list_file}'''.format(src_file = input_file, dst_file = output_file,
+    #     list_file=list_file)
+    # cmd_output = os.system(shell_script)
 
     return   
 
