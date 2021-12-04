@@ -21,7 +21,6 @@
 #include "dirent.h"
 #include <cmsis_os2.h>
 #include "app_log.h"
-#include "config.h"
 
 #define MaxOpenFile  32
 #define FR_OK        0
@@ -75,7 +74,7 @@ void FileSystemInit(void)
     }
 
     app_lfs_format();
-    ret = app_lfs_init(LOSCFG_LFS_MAX_BLOCK_COUNT); 
+    ret = app_lfs_init();
     if (ret != 0) {
         APP_LOG_ERROR("[LFS] File system init failed! ret=%d", ret);
     }
@@ -349,7 +348,11 @@ int mkdir(const char *path, mode_t mode)
 {
     int ret = 0;
 
-    if ((strlen(path) >= APP_LFS_PATH_MAX) || (path == NULL)) {
+    if (path == NULL) {
+         return -1;
+    }
+
+    if (strlen(path) >= APP_LFS_PATH_MAX) {
         APP_LOG_ERROR("path name is too long!!!");
         return -1;
     }

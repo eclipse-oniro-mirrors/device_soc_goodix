@@ -60,7 +60,7 @@ int app_lfs_device_sync(const struct lfs_config *c);
 static uint32_t s_app_lfs_start_addr;
 static lfs_t    s_app_lfs_instance;
 
-static struct lfs_config s_app_lfs_cfg = 
+static const struct lfs_config s_app_lfs_cfg =
 {
     .context        = NULL,
     .read           = app_lfs_block_read,
@@ -70,6 +70,7 @@ static struct lfs_config s_app_lfs_cfg =
     .read_size      = APP_LFS_READ_SIZE,
     .prog_size      = APP_LFS_PROG_SIZE,
     .block_size     = APP_LFS_BLOCK_SIZE,
+    .block_count    = APP_LFS_BLOCK_COUNT,
     .block_cycles   = APP_LFS_BLOCK_CYCLES,
     .cache_size     = APP_LFS_CACHE_SIZE,
     .lookahead_size = APP_LFS_LOOKAHEAD_SIZE,
@@ -145,11 +146,10 @@ int app_lfs_device_sync(const struct lfs_config *c)
  * GLOBAL FUNCTION DEFINITIONS
  *****************************************************************************************
  */
-int app_lfs_init(int lfs_block_count)
+int app_lfs_init(void)
 {
-    int error_code = APP_LFS_ERR_OK;
+    int error_code;
 
-    s_app_lfs_cfg.block_count = lfs_block_count;
     error_code = lfs_mount(&s_app_lfs_instance, &s_app_lfs_cfg);
     if (LFS_ERR_OK != error_code)
     {
@@ -291,7 +291,6 @@ int app_lfs_file_remove(const char *file_path_str)
 
 void app_lfs_file_traverse(app_lfs_dir_id_t *p_dir_id, const char *dir_path_str, app_lfs_traverse_cb_t traverse_cb)
 {
-    int              ret_err;
     struct lfs_info  lfs_info;
     app_lfs_dir_id_t dir_id;
     char             name[APP_LFS_PATH_MAX] = {0};
@@ -308,7 +307,7 @@ void app_lfs_file_traverse(app_lfs_dir_id_t *p_dir_id, const char *dir_path_str,
 
     while (1)
     {
-        ret_err =  lfs_dir_read(&s_app_lfs_instance, p_dir_id, &lfs_info);
+        int ret_err =  lfs_dir_read(&s_app_lfs_instance, p_dir_id, &lfs_info);
 
         if (ret_err < LFS_ERR_OK)
         {
