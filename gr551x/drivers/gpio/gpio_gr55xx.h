@@ -12,10 +12,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#ifndef __GPIO_GR55XX_H
+#define __GPIO_GR55XX_H
 
-#ifndef __BOARDS_DEFINE_H
-#define __BOARDS_DEFINE_H
+#include "app_io.h"
+#include "app_gpiote.h"
+#include "gpio/gpio_core.h"
 
-#include "custom_config.h"
+#ifdef __cplusplus
+#if __cplusplus
+extern "C" {
+#endif /* __cplusplus */
+#endif /* __cplusplus */
 
-#endif
+struct Gr55xxGpioPortConfig {
+    app_io_mode_t mode;
+    app_io_pull_t pull;
+    GpioIrqFunc   irqFunc;
+    app_handle_mode_t handleMode;
+    void         *arg;
+};
+
+struct Gr55xxGpioCntlr {
+    struct GpioCntlr cntlr;
+};
+
+#ifdef __cplusplus
+#if __cplusplus
+}
+#endif /* __cplusplus */
+#endif /* __cplusplus */
+
+#endif /*__GPIO_GR55XX_H*/

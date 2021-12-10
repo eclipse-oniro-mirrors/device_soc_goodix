@@ -11,12 +11,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
+import("//kernel/liteos_m/liteos.gni")
 
-static_library("hal_update_static") {
-  sources = [ "hal_hota_board.c" ]
-  include_dirs = [
-    "//base/update/ota_lite/hals",
-    "//base/update/ota_lite/interfaces/kits",
+kernel_module("platform_startup") {
+  sources = [
+    "startup_gr55xx.s",
   ]
 }

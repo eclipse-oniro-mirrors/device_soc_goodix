@@ -11,12 +11,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
+import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
-static_library("hal_update_static") {
-  sources = [ "hal_hota_board.c" ]
-  include_dirs = [
-    "//base/update/ota_lite/hals",
-    "//base/update/ota_lite/interfaces/kits",
-  ]
+config("public") {
+  include_dirs = [ "." ]
+}
+
+kernel_module("watchdog") {
+  sources = [ "hi_watchdog.c" ]
 }

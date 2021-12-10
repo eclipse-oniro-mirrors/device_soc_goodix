@@ -13,9 +13,24 @@
  * limitations under the License.
  */
 
-#ifndef __BOARDS_DEFINE_H
-#define __BOARDS_DEFINE_H
+#include "hi_watchdog.h"
 
-#include "custom_config.h"
+void hi_watchdog_enable(void)
+{
+    return;
+}
 
-#endif
+void hi_watchdog_feed(void)
+{
+    return;
+}
+
+void hi_watchdog_disable(void)
+{
+    return;
+}
+
+unsigned int hi_watchdog_set_timeout(unsigned int timeout_ms)
+{
+    return -1;
+}

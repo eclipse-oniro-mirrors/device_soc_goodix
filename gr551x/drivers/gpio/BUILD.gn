@@ -11,11 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
-import("../drivers.gni")
+import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
-static_library("gpio") {
+hdf_driver("gpio") {
   sources = [ "gpio_gr55xx.c" ]
 
-  include_dirs = hdf_include_dirs
+  include_dirs = [
+    "//drivers/framework/support/platform/include/gpio",
+    "//drivers/framework/support/platform/include/fwk",
+  ]
 }
