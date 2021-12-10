@@ -11,12 +11,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
-
-static_library("hal_update_static") {
-  sources = [ "hal_hota_board.c" ]
-  include_dirs = [
-    "//base/update/ota_lite/hals",
-    "//base/update/ota_lite/interfaces/kits",
+import("//kernel/liteos_m/liteos.gni")
+module_name = get_path_info(rebase_path("."), "name")
+module_group(module_name) {
+  modules = [
+    "log",
+    "main",
+    "startup",
+    "system",
   ]
 }

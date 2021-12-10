@@ -11,21 +11,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import("//build/lite/config/component/lite_component.gni")
-import("drivers.gni")
+import("//drivers/adapter/khdf/liteos_m/hdf.gni")
 
-
-group("drivers") {
-
-  public_deps = []
-
-  if (hdf_drivers_gpio_enable) {
-    public_deps += [ "gpio:gpio" ]
-  }
-
-  if (hdf_drivers_uart_enable) {
-    public_deps += [ "uart:uart" ]
-  }
+module_group("drivers") {
+  modules = [
+    "gpio",
+    "uart",
+  ]
 }
-
-

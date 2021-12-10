@@ -12,16 +12,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#include "app_io.h"
-#include "app_gpiote.h"
+#include "gpio_gr55xx.h"
 #include "device_resource_if.h"
-#include "gpio/gpio_core.h"
 #include "hdf_device_desc.h"
 #include "hdf_log.h"
 #include "stdio.h"
 
-#define HDF_LOG_TAG gpio_gr55xx
+#define HDF_LOG_TAG             gpio_gr55xx
 #define GR55_IO_NUM_GPIO        32
 #define GR55_IO_NUM_AON         8
 #define GR55_IO_NUM_MSIO        5
@@ -34,24 +31,7 @@
 #define GR55_IO_PULL_DEFAULT    APP_IO_PULLUP
 #define GR55_IO_MODE_DEFAULT    APP_IO_MODE_OUT_PUT
 
-// #define HDF_LOGI    printf
-// #define HDF_LOGE    printf
-// #define GR55_GPIO_DEBUG
-
-struct Gr55xxGpioPortConfig {
-    app_io_mode_t mode;
-    app_io_pull_t pull;
-    GpioIrqFunc   irqFunc;
-    app_handle_mode_t handleMode;
-    void         *arg;
-};
-
-struct Gr55xxGpioCntlr {
-    struct GpioCntlr cntlr;
-};
-
 static struct Gr55xxGpioCntlr s_gr55xxGpioCntlr;
-
 struct Gr55xxGpioPortConfig s_portCfg[GR55_IO_NUM_MAX];
 
 static inline struct Gr55xxGpioCntlr *ToGr55xxGpioCntlr(struct GpioCntlr *cntlr)
@@ -420,9 +400,8 @@ static int32_t Gr55xxGpioReadDrs(struct Gr55xxGpioCntlr *gr55Gpio, const struct 
     uint16_t gpioIndex;
     uint16_t pullConfig;
     uint16_t handleModeConfig;
-    struct DeviceResourceIface *drsOps = NULL;
 
-    drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
+    struct DeviceResourceIface *drsOps = DeviceResourceGetIfaceInstance(HDF_CONFIG_SOURCE);
     if (drsOps == NULL || drsOps->GetUint16 == NULL || drsOps->GetUint16ArrayElem == NULL) {
         HDF_LOGE("%s: invalid drs ops fail!", __func__);
         return HDF_FAILURE;

@@ -30,8 +30,6 @@ extern "C" {
 #include "gr55xx_sys.h"
 
 
-// #define  LITE_OS_SEC_TEXT    SECTION_RAM_CODE
-
 /*=============================================================================
                                         System clock module configuration
 =============================================================================*/

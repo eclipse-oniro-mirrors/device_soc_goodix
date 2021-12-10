@@ -245,11 +245,12 @@ user:~/openharmony/vendor$ tree -L 3
    ​	`hb set -p `       选择工程
 
     goodix
-        >gr5515_sk_xts_demo
+        >gr5515_sk_iotlink_demo
+         gr5515_sk_xts_demo
 
    ​	`hb build -f --patch`  打patch并开始编译，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
 
-如果hb set命令提示报错，请先执行一次`pip3 install build/lite`
+如果hb set命令提示报错，请先执行一次`python3 -m pip install build/lite`
 
 ## 固件烧录
 
@@ -437,7 +438,7 @@ J-Link仿真器与开发板或者产品正确连接，且J-Link仿真器的USB�
 
 ## 相关仓库
 
-[devboard_vendor_goodix_gr5515_sk_basic](https://gitee.com/openharmony-sig/devboard_vendor_goodix_gr5515_sk_basic)
+[vendor_goodix](https://gitee.com/openharmony-sig/vendor_goodix)
 
 [device_board_goodix](https://gitee.com/openharmony-sig/device_board_goodix)
 

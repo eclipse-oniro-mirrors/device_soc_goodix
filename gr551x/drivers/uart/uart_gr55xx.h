@@ -13,8 +13,8 @@
  * limitations under the License.
  */
 
-#ifndef UART_GR55XX_H
-#define UART_GR55XX_H
+#ifndef __UART_GR55XX_H
+#define __UART_GR55XX_H
 
 #include "poll.h"
 #include "uart_if.h"
@@ -64,4 +64,4 @@ struct UartDriverData {
 #endif /* __cplusplus */
 #endif /* __cplusplus */
 
-#endif /* UART_PL011_H */
+#endif /* __UART_GR55XX_H */
