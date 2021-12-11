@@ -92,11 +92,10 @@ static int32_t FsDriverInit(struct HdfDeviceObject *object)
         fs[i].lfs_cfg.block_cycles = 500;
 
         SetDefaultMountPath(i, fs[i].mount_point);
-    
         littlefs_flash_init(&fs[i].lfs_cfg);
+
         int ret = mount(NULL, fs[i].mount_point, "littlefs", 0, &fs[i].lfs_cfg);
         HDF_LOGI("%s: mount fs on '%s' %s\n", __func__, fs[i].mount_point, (ret == 0) ? "succeed" : "failed");
-
         if (CheckPathIsMounted(fs[i].mount_point, &fileOpInfo) == TRUE) {
             int lfs_ret = lfs_mkdir(&fileOpInfo->lfsInfo, fs[i].mount_point);
             if (lfs_ret == LFS_ERR_OK) {
