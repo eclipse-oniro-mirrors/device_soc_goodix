@@ -225,6 +225,15 @@ user:~/openharmony/device/board$ tree -L 3
 user:~/openharmony/vendor$ tree -L 3
 .
 └── goodix
+    ├── gr5515_sk_iotlink_demo                    # BLE应用示例工程
+    │   ├── ble_template                          # BLE示例代码
+    │   ├── BUILD.gn                              # GN构建脚本
+    │   ├── config.json                           # 子系统裁配置裁剪脚本
+    │   ├── hals                                  # 产品参数配置
+    │   ├── hdf_config                            # HDF硬件描述配置
+    │   ├── kernel_configs                        # Kconfig配置输出
+    │   ├── patches                               # 源码补丁
+    │   └── patch.yml                             # 补丁执行脚本
     └── gr5515_sk_xts_demo                        # XTS测试示例工程
         ├── BUILD.gn                              # GN构建脚本
         ├── config.json                           # 子系统裁配置裁剪脚本
