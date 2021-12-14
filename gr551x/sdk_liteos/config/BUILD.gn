@@ -13,12 +13,10 @@
 
 import("//kernel/liteos_m/liteos.gni")
 
+config("public") {
+  include_dirs = [ "." ]
+}
+
 module_name = get_path_info(rebase_path("."), "name")
-module_group(module_name) {
-  modules = [
-    "platform",
-    "gr551x_sdk",
-    "liteos_m",
-    "config",
-  ]
+kernel_module(module_name) {
 }
