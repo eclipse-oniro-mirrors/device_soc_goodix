@@ -19,7 +19,7 @@ config("public") {
 
 kernel_module("platform_system") {
   sources = [
-    "syscalls.c",
-    "sysmem.c",
+    "dprintf.c",
+    "system.c",
   ]
 }

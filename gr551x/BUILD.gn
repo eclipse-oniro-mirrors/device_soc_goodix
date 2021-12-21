@@ -45,6 +45,5 @@ module_group(module_name) {
   modules = [
     "sdk_liteos",
     "components",
-    "drivers",
   ]
 }

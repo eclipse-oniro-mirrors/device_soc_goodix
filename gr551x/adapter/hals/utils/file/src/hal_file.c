@@ -50,6 +50,42 @@ int Find_Free_Num(void)
     return i;
 }
 
+
+int ReadModeChange(int oflag)
+{
+    int ret = 0;
+    int buffer = 0;
+
+    buffer = (oflag & 0x000f);
+    if (buffer == O_RDONLY_FS) {
+        ret = O_RDONLY;
+    } else if (buffer == O_WRONLY_FS) {
+        ret = O_WRONLY;
+    } else if (buffer == O_RDWR_FS) {
+        ret = O_RDWR;
+    }
+
+    buffer = (oflag & 0x00f0);
+    if ((buffer & 0x0040) != 0) {
+        ret |= O_CREAT;
+    }
+
+    if ((buffer & 0x0080) != 0) {
+        ret |= O_EXCL;
+    }
+
+    buffer = (oflag & 0x0f00);
+    if ((buffer & 0x0200) != 0) {
+        ret |= O_TRUNC;
+    }
+
+    if ((buffer & 0x0400) != 0) {
+        ret |= O_APPEND;
+    }
+
+    return ret;
+}
+
 int HalFileOpen(const char *path, int oflag, int mode)
 {
     char *file_path;
@@ -75,7 +111,7 @@ int HalFileOpen(const char *path, int oflag, int mode)
     strcat(file_path, "/");
     strcat(file_path, path);
 
-    int fs_fd = open(file_path, oflag);
+    int fs_fd = open(file_path, ReadModeChange(oflag));
     if (fs_fd < 0) {
         LOG_E("open file '%s' failed, %s\r\n", file_path, strerror(errno));
         free(file_path);
