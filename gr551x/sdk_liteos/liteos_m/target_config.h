@@ -20,15 +20,8 @@
 #ifndef _TARGET_CONFIG_H
 #define _TARGET_CONFIG_H
 
-#ifdef __cplusplus
-#if __cplusplus
-extern "C" {
-#endif /* __cplusplus */
-#endif /* __cplusplus */
-
 #include "gr55xx.h"
 #include "gr55xx_sys.h"
-
 
 /*=============================================================================
                                         System clock module configuration
@@ -100,13 +93,7 @@ extern unsigned char __los_heap_addr_end__[];
                                         Exception module configuration
 =============================================================================*/
 #define LOSCFG_PLATFORM_EXC                                 1
-
 #define LOSCFG_KERNEL_PRINTF                                1
-#ifdef __cplusplus
-#if __cpluspluss
-}
-#endif /* __cplusplus */
-#endif /* __cplusplus */
 
 
 #endif /* _TARGET_CONFIG_H */

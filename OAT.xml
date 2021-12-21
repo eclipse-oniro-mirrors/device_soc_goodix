@@ -23,13 +23,19 @@
         <policylist>
             <policy name="projectPolicy" desc="">
                 <policyitem type="copyright" name="GOODIX" path=".*" desc="original goodix copyright"/>
-                <policyitem type="license" name="Apache" path=".*" desc="goodix use apache 2.0 license"/>
+                <policyitem type="copyright" name="Goodix Technology Co." path=".*" desc="original goodix copyright"/>
+                <policyitem type="copyright" name="Shenzhen Huiding Technology Co." path=".*" desc="original goodix copyright"/>
+		        <policyitem type="license" name="BSD-3-Clause" path=".*" desc="goodix use BSD license"/>
+		        <policyitem type="license" name="Apache-2.0" path=".*" desc="goodix use apache 2.0 license"/>
             </policy>
         </policylist>
         <filefilterlist>
-            <filefilter name="binaryFileTypePolicyFilter" desc="Filters for binary file policies" >
+            <filefilter name="defaultFilter" desc="Filters for binary file policies" >
                 <filteritem type="filename" name="*.a|*.so|*.bin|*.png" desc="Temp files"/>
-            </filefilter>
+		        <filteritem type="filepath" name="gr551x/sdk_liteos/gr551x_sdk/components/libraries/.*" desc="Goodix open source SDK code"/>
+                <filteritem type="filepath" name="gr551x/sdk_liteos/gr551x_sdk/toolchain/gr551x/include/.*" desc="Goodix open source SDK code"/>
+                <filteritem type="filepath" name="gr551x/sdk_liteos/gr551x_sdk/components/patch/ind/.*" desc="Goodix open source SDK code"/>
+	        </filefilter>
         </filefilterlist>
     </oatconfig>
 </configuration>

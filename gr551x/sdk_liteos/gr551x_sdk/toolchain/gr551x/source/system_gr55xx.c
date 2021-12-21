@@ -6,7 +6,7 @@
  * @date     12. June 2018
  ******************************************************************************/
 /*
- * Copyright (c) 2009-2016 ARM Limited. All rights reserved.
+ * Copyright (c) 2018 GOODIX. All rights reserved.
  *
  * SPDX-License-Identifier: Apache-2.0
  *
@@ -39,6 +39,20 @@
 
 #define READ_VERSION_ADDR()          REG_PL_RD(0x45004)
 #define CALIB_LP_CYCLE_COUNT           20
+
+#define REGION_TABLE_LIMIT           0x0007e9c0
+#define REGION_TABLE_BASE            0x0007e990
+#define SCATTERLOAD_COPY             0x00062d05
+#define SCATTERLOAD_ZEROINIT         0x00062d21
+#define DFU_DATA_START_ADDR         (0x800000 + 0x4000)
+
+typedef struct
+{
+    uint32_t rom_addr;
+    uint32_t ram_addr;
+    uint32_t len;
+    uint32_t fun;
+} sactter_copy_info_t;
 
 volatile uint32_t g_app_msp_addr;   /* record app msp address */
 
@@ -117,7 +131,31 @@ void set_msp()
     #endif
     #endif
 }
- 
+
+static void __sdk_init(void)
+{
+    sactter_copy_info_t sactter_copy_info = {0};
+
+    for(int i = 0; i < (REGION_TABLE_LIMIT - REGION_TABLE_BASE) / (sizeof(sactter_copy_info_t)); i++)
+    {
+        memcpy((void *)&sactter_copy_info,(void *)(REGION_TABLE_BASE + i * sizeof(sactter_copy_info_t)), sizeof(sactter_copy_info_t));
+
+        if((sactter_copy_info.fun + 1) == SCATTERLOAD_COPY)
+        {
+            if (sactter_copy_info.ram_addr == DFU_DATA_START_ADDR)
+                continue;
+            memcpy((void *)(sactter_copy_info.ram_addr), (void *)(sactter_copy_info.rom_addr), sactter_copy_info.len);
+        }
+        else
+        {
+            if((sactter_copy_info.fun + 1) == SCATTERLOAD_ZEROINIT)
+            {
+                memset((void *)(sactter_copy_info.ram_addr), 0, sactter_copy_info.len);
+            }
+        }
+    }
+}
+
 void SystemInit(void)
 {
     #if (__FPU_USED == 1)
@@ -132,8 +170,7 @@ void SystemInit(void)
     if(COLD_BOOT == get_wakeup_flag())
     {
         #if defined(GR5515_D)
-        extern void sdk_init(void);
-        sdk_init();
+        __sdk_init();
         #endif
     }
 

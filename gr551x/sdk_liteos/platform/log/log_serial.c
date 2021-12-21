@@ -23,7 +23,6 @@ static bool uart_initialized = false;
 
 void bsp_uart_init(void)
 {
-    uint32_t ret;
     app_uart_tx_buf_t uart_buffer;
     app_uart_params_t uart_param;
 
@@ -107,3 +106,9 @@ int HiLogWriteInternal(const char *buffer, size_t bufLen)
 
     return ret;
 }
+
+void _putchar(char character)
+{
+    bsp_uart_send(&character, 1);
+}
+
