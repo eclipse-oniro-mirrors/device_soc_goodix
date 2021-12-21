@@ -33,3 +33,8 @@ int access(const char *pathname, int mode)
 
     return 0;
 }
+
+int fcntl(int fd, int cmd, long arg)
+{
+    return 0;
+}
