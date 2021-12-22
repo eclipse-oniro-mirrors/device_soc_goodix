@@ -184,7 +184,6 @@ user:~/openharmony/device/soc$ tree -L 3
     │   ├── adapter                               # 外设驱动、BLE、文件系统适配
     │   ├── BUILD.gn                              # GN构建脚本
     │   ├── components                            # 组件
-    │   ├── drivers                               # HDF外设驱动
     │   ├── hcs                                   # 设备描述文件
     │   ├── Kconfig.liteos_m.defconfig.gr551x     # gr551x Kconfig默认配置
     │   ├── Kconfig.liteos_m.defconfig.series     # series Kconfig默认配置
@@ -231,18 +230,14 @@ user:~/openharmony/vendor$ tree -L 3
     │   ├── config.json                           # 子系统裁配置裁剪脚本
     │   ├── hals                                  # 产品参数配置
     │   ├── hdf_config                            # HDF硬件描述配置
-    │   ├── kernel_configs                        # Kconfig配置输出
-    │   ├── patches                               # 源码补丁
-    │   └── patch.yml                             # 补丁执行脚本
+    │   └── kernel_configs                        # Kconfig配置输出
     └── gr5515_sk_xts_demo                        # XTS测试示例工程
         ├── BUILD.gn                              # GN构建脚本
         ├── config.json                           # 子系统裁配置裁剪脚本
         ├── tests                                 # 测试用例
         ├── hals                                  # 产品参数配置
         ├── hdf_config                            # HDF硬件描述配置
-        ├── kernel_configs                        # Kconfig配置输出
-        ├── patches                               # 源码补丁
-        └── patch.yml                             # 补丁执行脚本
+        └── kernel_configs                        # Kconfig配置输出
 ```
 
 ## 编译工程
@@ -257,7 +252,7 @@ user:~/openharmony/vendor$ tree -L 3
         >gr5515_sk_iotlink_demo
          gr5515_sk_xts_demo
 
-   ​	`hb build -f --patch`  打patch并开始编译，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
+   ​	`hb build -f`  开始编译，后续修改了文件只需要执行`hb build -f`即可，不需要重复以上步骤。
 
 如果hb set命令提示报错，请先执行一次`python3 -m pip install build/lite`
 
